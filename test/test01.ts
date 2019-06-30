@@ -1,4 +1,4 @@
-import { literal, or, sequence } from "../src/index"
+import { literal, or, sequence, repeat, repeat0, repeat1 } from "../src/index"
 
 test("literal", () => {
   const l = literal("hoge")
@@ -24,4 +24,30 @@ test("sequence", () => {
   expect(sequence1("hoge")).toBe(null)
   expect(sequence1("fuga")).toBe(null)
   expect(sequence1("piyo")).toBe(null)
+})
+
+describe("repeat", () => {
+  test("repeat", () => {
+    const l1 = literal("ab")
+    const repeat_ = repeat(l1, 3)
+    expect(repeat_("ababab")).toBe(6)
+    expect(repeat_("ababababab")).toBe(10)
+    expect(repeat_("ba")).toBe(null)
+  })
+  test("repeat0", () => {
+    const l1 = literal("ab")
+    const repeat_ = repeat0(l1)
+    expect(repeat_("ab")).toBe(2)
+    expect(repeat_("ababab")).toBe(6)
+    expect(repeat_("ababababab")).toBe(10)
+    expect(repeat_("")).toBe(0)
+  })
+  test("repeat1", () => {
+    const l1 = literal("ab")
+    const repeat_ = repeat1(l1)
+    expect(repeat_("ab")).toBe(2)
+    expect(repeat_("ababab")).toBe(6)
+    expect(repeat_("ababababab")).toBe(10)
+    expect(repeat_("")).toBe(null)
+  })
 })
