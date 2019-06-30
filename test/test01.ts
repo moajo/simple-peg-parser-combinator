@@ -1,4 +1,6 @@
 import { literal, or, sequence, repeat, repeat0, repeat1 } from "../src/index"
+import { sequenceRuntime } from "../src/components/sequence"
+import ParserContext from "../src/context"
 
 test("literal", () => {
   const l = literal("hoge")
@@ -50,4 +52,17 @@ describe("repeat", () => {
     expect(repeat_("ababababab")).toBe(10)
     expect(repeat_("")).toBe(null)
   })
+})
+
+test("sequenceRuntime", () => {
+  const l1 = literal("hoge")
+  const l2 = literal("fuga")
+  const c = new ParserContext()
+  c.add("hoge", l1)
+  c.add("fuga", l2)
+  const sequence1 = sequenceRuntime(c, "hoge", "fuga")
+  expect(sequence1("hogefuga")).toBe(8)
+  expect(sequence1("hoge")).toBe(null)
+  expect(sequence1("fuga")).toBe(null)
+  expect(sequence1("piyo")).toBe(null)
 })
