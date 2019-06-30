@@ -1,22 +1,32 @@
 import { Parser } from "../types"
 import ParserContext from "../context"
+import { ParseResult } from "../types"
 
-export const repeat = (parser: Parser, minCount: number) => (s: string) => {
+export const repeat = (
+  parser: Parser<any>,
+  minCount: number,
+  mapper?: (value: any[]) => any
+) => (s: string) => {
   let c = 0
   let total = 0
+  let values = []
   while (true) {
     const result = parser(s)
     if (result === null) {
       break
     }
-    total += result
+    total += result.length
+    values.push(result.value)
     c += 1
-    s = s.substr(result)
+    s = s.substr(result.length)
   }
   if (c < minCount) {
     return null
   }
-  return total
+  return {
+    length: total,
+    value: mapper ? mapper(values) : values
+  } as ParseResult<any[]>
 }
 export const repeatRuntime = (
   context: ParserContext,
@@ -25,26 +35,32 @@ export const repeatRuntime = (
 ) => (s: string) => {
   let c = 0
   let total = 0
+  let values = []
   while (true) {
     const result = context.get(parserName)(s)
     if (result === null) {
       break
     }
-    total += result
+    total += result.length
+    values.push(result.value)
     c += 1
-    s = s.substr(result)
+    s = s.substr(result.length)
   }
   if (c < minCount) {
     return null
   }
-  return total
+  return {
+    length: total,
+    value: values
+  } as ParseResult<any[]>
 }
 
 // 1 or more
-export const repeat1 = (parser: Parser) => repeat(parser, 1)
+export const repeat1 = (parser: Parser<any>, mapper?: (value: any[]) => any) =>
+  repeat(parser, 1, mapper)
 
 // 0 or more
-export const repeat0 = (parser: Parser) => repeat(parser, 0)
+export const repeat0 = (parser: Parser<any>) => repeat(parser, 0)
 
 // 1 or more
 export const repeat1Runtime = (c: ParserContext, parserName: string) =>

@@ -1,7 +1,7 @@
 import { Parser } from "../types"
 import ParserContext from "../context"
 
-export const or = (...parsers: Parser[]) => (s: string) => {
+export const or = (...parsers: Parser<any>[]) => (s: string) => {
   for (const parser of parsers) {
     const result = parser(s)
     if (result !== null) {
