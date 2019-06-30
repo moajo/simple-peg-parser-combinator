@@ -1,5 +1,8 @@
-import main from "../src/index"
+import { literal } from "../src/index"
 
-test("hoge", () => {
-  expect(main()).toBe(1)
+test("literal", () => {
+  const l = literal("hoge")
+  expect(l("hoge")).toBe("hoge".length)
+  expect(l("hogea")).toBe("hoge".length)
+  expect(l("fuga")).toBe(null)
 })
