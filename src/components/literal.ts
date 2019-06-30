@@ -1,12 +1,13 @@
-export const literal = (text: string, mapper?: (value: string) => any) => (
-  s: string
-) => {
-  if (s.startsWith(text)) {
-    return {
-      length: text.length,
-      value: mapper ? mapper(text) : text
+import { Parser } from "../types"
+
+export const literal = (text: string) =>
+  new Parser((s: string) => {
+    if (s.startsWith(text)) {
+      return {
+        length: text.length,
+        value: text
+      }
+    } else {
+      return null
     }
-  } else {
-    return null
-  }
-}
+  })
