@@ -66,3 +66,16 @@ export const repeat1Runtime = (c: ParserContext, parserName: string) =>
 // 0 or more
 export const repeat0Runtime = (c: ParserContext, parserName: string) =>
   repeatRuntime(c, parserName, 0)
+
+export const zeroOrOne = (context: ParserContext, parserName: string) =>
+  new Parser((s: string) => {
+    const result = context.get(parserName).parse(s)
+    if (result) {
+      return result
+    } else {
+      return {
+        length: 0,
+        value: null
+      }
+    }
+  })
