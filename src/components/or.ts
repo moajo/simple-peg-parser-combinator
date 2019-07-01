@@ -1,5 +1,5 @@
 import { Parser } from "../types"
-import ParserContext from "../context"
+import ParserResolver from "../context"
 
 export const or = (...parsers: Parser<any>[]) =>
   new Parser((s: string) => {
@@ -12,7 +12,7 @@ export const or = (...parsers: Parser<any>[]) =>
     return null
   })
 
-export const orRuntime = (c: ParserContext, ...parsers: string[]) =>
+export const orRuntime = (c: ParserResolver, ...parsers: string[]) =>
   new Parser((s: string) => {
     for (const parser of parsers) {
       const result = c.get(parser).parse(s)

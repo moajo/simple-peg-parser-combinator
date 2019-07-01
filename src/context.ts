@@ -1,6 +1,6 @@
 import { Parser } from "./types"
 
-export default class ParserContext {
+export default class ParserResolver {
   private mem: { [key: string]: Parser<any> } = {}
   add(name: string, parser: Parser<any>) {
     this.mem[name] = parser

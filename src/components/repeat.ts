@@ -1,5 +1,5 @@
 import { Parser } from "../types"
-import ParserContext from "../context"
+import ParserResolver from "../context"
 import { ParseResult } from "../types"
 
 export const repeat = (parser: Parser<any>, minCount: number) =>
@@ -26,7 +26,7 @@ export const repeat = (parser: Parser<any>, minCount: number) =>
     } as ParseResult<any[]>
   })
 export const repeatRuntime = (
-  context: ParserContext,
+  context: ParserResolver,
   parserName: string,
   minCount: number
 ) =>
@@ -60,14 +60,14 @@ export const repeat1 = (parser: Parser<any>) => repeat(parser, 1)
 export const repeat0 = (parser: Parser<any>) => repeat(parser, 0)
 
 // 1 or more
-export const repeat1Runtime = (c: ParserContext, parserName: string) =>
+export const repeat1Runtime = (c: ParserResolver, parserName: string) =>
   repeatRuntime(c, parserName, 1)
 
 // 0 or more
-export const repeat0Runtime = (c: ParserContext, parserName: string) =>
+export const repeat0Runtime = (c: ParserResolver, parserName: string) =>
   repeatRuntime(c, parserName, 0)
 
-export const zeroOrOne = (context: ParserContext, parserName: string) =>
+export const zeroOrOne = (context: ParserResolver, parserName: string) =>
   new Parser((s: string) => {
     const result = context.get(parserName).parse(s)
     if (result) {

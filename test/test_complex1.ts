@@ -1,5 +1,5 @@
 import { literal, or, repeat1 } from "../src/index"
-import ParserContext from "../src/context"
+import ParserResolver from "../src/context"
 import { sequenceRuntime } from "../src/components/sequence"
 import { orRuntime } from "../src/components/or"
 import { repeat0Runtime } from "../src/components/repeat"
@@ -12,7 +12,7 @@ describe("expression", () => {
       )
     )
   ).map(arr => (arr as number[]).reduce((prev, current) => prev * 10 + current))
-  let c = new ParserContext()
+  let c = new ParserResolver()
   c.add("+", literal("+"))
   c.add("-", literal("-"))
   c.add("*", literal("*"))

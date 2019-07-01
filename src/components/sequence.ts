@@ -1,5 +1,5 @@
 import { Parser, ParseResult } from "../types"
-import ParserContext from "../context"
+import ParserResolver from "../context"
 
 export const sequence = (...parsers: Parser<any>[]) =>
   new Parser((s: string) => {
@@ -20,7 +20,10 @@ export const sequence = (...parsers: Parser<any>[]) =>
     } as ParseResult<any[]>
   })
 
-export const sequenceRuntime = (context: ParserContext, ...parsers: string[]) =>
+export const sequenceRuntime = (
+  context: ParserResolver,
+  ...parsers: string[]
+) =>
   new Parser((s: string) => {
     let total = 0
     let values = []

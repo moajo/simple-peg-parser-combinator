@@ -1,5 +1,5 @@
 import { literal, or, repeat1 } from "../src/index"
-import ParserContext from "../src/context"
+import ParserResolver from "../src/context"
 import { sequenceRuntime, sequence } from "../src/components/sequence"
 import { orRuntime } from "../src/components/or"
 import { zeroOrOne, repeat0, repeat0Runtime } from "../src/components/repeat"
@@ -8,7 +8,7 @@ import { whitespace, anyCharactorOf } from "../src/components/utils"
 // see: https://github.com/pegjs/pegjs/blob/master/examples/json.pegjs
 
 describe("json", () => {
-  let c = new ParserContext()
+  let c = new ParserResolver()
   c.add("[", sequence(whitespace, literal("["), whitespace))
   c.add("]", sequence(whitespace, literal("]"), whitespace))
   c.add("{", sequence(whitespace, literal("{"), whitespace))
