@@ -41,9 +41,16 @@ describe("json", () => {
   )
 
   // 4. object
+  const objectValues = zeroOrOne(
+    sequence("member", repeat0(sequence(",", "member").map(vs => vs[1]))).map(
+      vs => {
+        return [vs[0]].concat(vs[1])
+      }
+    )
+  ).map(v => (v == null ? [] : v))
   c.add(
     "object",
-    sequence("{", "objectValues", "}").map(vs => {
+    sequence("{", objectValues, "}").map(vs => {
       const a = vs[1]
       let obj: { [key: string]: any } = {}
       a.forEach((member: { key: string; value: any }) => {
@@ -51,16 +58,6 @@ describe("json", () => {
       })
       return obj
     })
-  )
-  c.add(
-    "objectValues",
-    zeroOrOne(
-      sequence("member", repeat0(sequence(",", "member").map(vs => vs[1]))).map(
-        vs => {
-          return [vs[0]].concat(vs[1])
-        }
-      )
-    ).map(v => (v == null ? [] : v))
   )
 
   c.add(
@@ -90,10 +87,10 @@ describe("json", () => {
   c.add("number", digits) //TODO: more detail
 
   //7. string
-  c.add("string", sequence('"', "chars", '"').map(vs => vs[1].join("")))
-  c.add("chars", repeat0("char"))
-  c.add("char", anyCharactorOf("abcdefghijklmnopqrstuvwyz")) //TODO: more detail
-  c.add('"', literal('"'))
+  const quote = literal('"')
+  const char = anyCharactorOf("abcdefghijklmnopqrstuvwyz") //TODO: more detail
+  const chars = repeat0(char)
+  c.add("string", sequence(quote, chars, quote).map(vs => vs[1].join("")))
 
   test("literals", () => {
     let json = c.get("value")
