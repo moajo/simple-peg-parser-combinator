@@ -1,4 +1,14 @@
-import { literal, or, sequence, repeat, repeat0, repeat1 } from "../src/index"
+import {
+  literal,
+  or,
+  sequence,
+  repeat,
+  repeat0,
+  repeat1,
+  anyChar,
+  andPredicate,
+  notPredicate
+} from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
 test("literal", () => {
@@ -56,5 +66,28 @@ describe("repeat", () => {
     expect(repeat_.parse(pc, "ababab")!.length).toBe(6)
     expect(repeat_.parse(pc, "ababababab")!.length).toBe(10)
     expect(repeat_.parse(pc, "")).toBe(null)
+  })
+})
+
+test("any", () => {
+  const pc = new ParseContext(new ParserCache(), new ParserResolver())
+  expect(anyChar.parse(pc, "ab")!.length).toBe(1)
+  expect(anyChar.parse(pc, ".")!.length).toBe(1)
+  expect(anyChar.parse(pc, "6")!.length).toBe(1)
+  expect(anyChar.parse(pc, "")).toBe(null)
+})
+
+describe("predicate", () => {
+  test("andPredicate", () => {
+    const pc = new ParseContext(new ParserCache(), new ParserResolver())
+    const p = andPredicate(literal("a"))
+    expect(p.parse(pc, "ab")!.length).toBe(0)
+    expect(p.parse(pc, "ba")).toBe(null)
+  })
+  test("notPredicate", () => {
+    const pc = new ParseContext(new ParserCache(), new ParserResolver())
+    const p = notPredicate(literal("a"))
+    expect(p.parse(pc, "ba")!.length).toBe(0)
+    expect(p.parse(pc, "ab")).toBe(null)
   })
 })
