@@ -1,34 +1,13 @@
-import { Parser, ParseResult } from "../types"
-import ParserResolver from "../context"
+import { Parser, ParseResult, ParserIdentifier } from "../types"
 
-export const sequence = (...parsers: Parser<any>[]) =>
+export const sequence = (...parsers: ParserIdentifier<any>[]) =>
   new Parser((pc, s: string) => {
     let total = 0
     let values = []
-    for (const parser of parsers) {
-      const result = parser.parse(pc, s)
-      if (result === null) {
-        return null
+    for (let parser of parsers) {
+      if (typeof parser == "string") {
+        parser = pc.resolver.get(parser)
       }
-      total += result.length
-      values.push(result.value)
-      s = s.substr(result.length)
-    }
-    return {
-      length: total,
-      value: values
-    } as ParseResult<any[]>
-  })
-
-export const sequenceRuntime = (
-  context: ParserResolver,
-  ...parsers: string[]
-) =>
-  new Parser((pc, s: string) => {
-    let total = 0
-    let values = []
-    for (const parserName of parsers) {
-      const parser = context.get(parserName)
       const result = parser.parse(pc, s)
       if (result === null) {
         return null

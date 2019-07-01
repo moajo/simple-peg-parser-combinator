@@ -1,5 +1,4 @@
 import { literal, or, sequence, repeat, repeat0, repeat1 } from "../src/index"
-import { sequenceRuntime } from "../src/components/sequence"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
 test("literal", () => {
@@ -59,18 +58,4 @@ describe("repeat", () => {
     expect(repeat_.parse(pc, "ababababab")!.length).toBe(10)
     expect(repeat_.parse(pc, "")).toBe(null)
   })
-})
-
-test("sequenceRuntime", () => {
-  const l1 = literal("hoge")
-  const l2 = literal("fuga")
-  const c = new ParserResolver()
-  c.add("hoge", l1)
-  c.add("fuga", l2)
-  const sequence1 = sequenceRuntime(c, "hoge", "fuga")
-  const pc = new ParseContext(new ParserCache(), c)
-  expect(sequence1.parse(pc, "hogefuga")!.length).toBe(8)
-  expect(sequence1.parse(pc, "hoge")).toBe(null)
-  expect(sequence1.parse(pc, "fuga")).toBe(null)
-  expect(sequence1.parse(pc, "piyo")).toBe(null)
 })

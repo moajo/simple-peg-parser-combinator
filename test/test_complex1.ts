@@ -1,6 +1,5 @@
-import { literal, or, repeat1, repeat0 } from "../src/index"
+import { literal, or, repeat1, repeat0, sequence } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
-import { sequenceRuntime } from "../src/components/sequence"
 
 describe("expression", () => {
   const digits = repeat1(
@@ -17,25 +16,24 @@ describe("expression", () => {
   c.add("/", literal("/"))
   c.add("(", literal("("))
   c.add(")", literal(")"))
-  c.add("digits", digits)
-  c.add(
-    "bracedExpression",
-    sequenceRuntime(c, "(", "expression", ")").map(vs => vs[1])
-  )
-  c.add("factor", or("bracedExpression", "digits"))
+  c.add("bracedExpression", sequence("(", "expression", ")").map(vs => vs[1]))
+  c.add("factor", or("bracedExpression", digits))
 
   c.add("*/", or("*", "/"))
   c.add("+-", or("+", "-"))
   c.add(
-    "termTail1",
-    sequenceRuntime(c, "*/", "factor").map(vs => {
-      return vs[0] == "*" ? (a: number) => a * vs[1] : (a: number) => a / vs[1]
-    })
+    "termTail",
+    repeat0(
+      sequence("*/", "factor").map(vs => {
+        return vs[0] == "*"
+          ? (a: number) => a * vs[1]
+          : (a: number) => a / vs[1]
+      })
+    )
   )
-  c.add("termTail", repeat0("termTail1"))
   c.add(
     "term",
-    sequenceRuntime(c, "factor", "termTail").map(vs => {
+    sequence("factor", "termTail").map(vs => {
       let r = vs[0]
       for (let i = 0; i < vs[1].length; i++) {
         r = vs[1][i](r)
@@ -46,14 +44,14 @@ describe("expression", () => {
 
   c.add(
     "exprTail1",
-    sequenceRuntime(c, "+-", "term").map(vs =>
+    sequence("+-", "term").map(vs =>
       vs[0] == "+" ? (a: number) => a + vs[1] : (a: number) => a - vs[1]
     )
   )
   c.add("exprTail", repeat0("exprTail1"))
   c.add(
     "expression",
-    sequenceRuntime(c, "term", "exprTail").map(vs => {
+    sequence("term", "exprTail").map(vs => {
       let r = vs[0]
       for (let i = 0; i < vs[1].length; i++) {
         r = vs[1][i](r)
@@ -63,14 +61,13 @@ describe("expression", () => {
   )
 
   test("digits", () => {
-    let digits_ = digits
     const pc = new ParseContext(new ParserCache(), c)
-    expect(digits_.parse(pc, "1")!.value).toBe(1)
-    expect(digits_.parse(pc, "0")!.value).toBe(0)
-    expect(digits_.parse(pc, "9")!.value).toBe(9)
-    expect(digits_.parse(pc, "123")!.value).toBe(123)
-    expect(digits_.parse(pc, "99999999999999")!.value).toBe(99999999999999)
-    expect(digits_.parse(pc, "aaa")).toBe(null)
+    expect(digits.parse(pc, "1")!.value).toBe(1)
+    expect(digits.parse(pc, "0")!.value).toBe(0)
+    expect(digits.parse(pc, "9")!.value).toBe(9)
+    expect(digits.parse(pc, "123")!.value).toBe(123)
+    expect(digits.parse(pc, "99999999999999")!.value).toBe(99999999999999)
+    expect(digits.parse(pc, "aaa")).toBe(null)
   })
 
   test("factor", () => {
