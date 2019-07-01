@@ -15,8 +15,7 @@ describe("json", () => {
   c.add(",", sequence(whitespace, literal(","), whitespace))
   c.add(":", sequence(whitespace, literal(":"), whitespace))
 
-  c.add("whitespace", whitespace)
-  c.add("JSON", sequence("whitespace", "value", "whitespace").map(vs => vs[1]))
+  c.add("JSON", sequence(whitespace, "value", whitespace).map(vs => vs[1]))
 
   c.add(
     "value",
@@ -55,15 +54,15 @@ describe("json", () => {
   )
   c.add(
     "objectValues",
-    zeroOrOne("objectValues1").map(v => (v == null ? [] : v))
+    zeroOrOne(
+      sequence("member", repeat0(sequence(",", "member").map(vs => vs[1]))).map(
+        vs => {
+          return [vs[0]].concat(vs[1])
+        }
+      )
+    ).map(v => (v == null ? [] : v))
   )
-  c.add(
-    "objectValues1",
-    sequence("member", "objectTail").map(vs => {
-      return [vs[0]].concat(vs[1])
-    })
-  )
-  c.add("objectTail", repeat0(sequence(",", "member").map(vs => vs[1])))
+
   c.add(
     "member",
     sequence("string", ":", "value").map(vs => ({
@@ -74,12 +73,11 @@ describe("json", () => {
 
   // 5. array
   c.add("array", sequence("[", "arrayValues", "]").map(vs => vs[1]))
-  c.add("arrayValues", zeroOrOne("arrayValues1").map(v => (v == null ? [] : v)))
-  c.add(
-    "arrayValues1",
-    sequence("value", "arrayTail").map(vs => [vs[0]].concat(vs[1]))
+  const arrayTail = repeat0(sequence(",", "value").map(vs => vs[1]))
+  const arrayValues1 = sequence("value", arrayTail).map(vs =>
+    [vs[0]].concat(vs[1])
   )
-  c.add("arrayTail", repeat0(sequence(",", "value").map(vs => vs[1])))
+  c.add("arrayValues", zeroOrOne(arrayValues1).map(v => (v == null ? [] : v)))
 
   // 6. number
   const digits = repeat1(

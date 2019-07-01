@@ -33,9 +33,12 @@ export const repeat1 = (parser: ParserIdentifier<any>) => repeat(parser, 1)
 // 0 or more
 export const repeat0 = (parser: ParserIdentifier<any>) => repeat(parser, 0)
 
-export const zeroOrOne = (parserName: string) =>
+export const zeroOrOne = (parser: ParserIdentifier<any>) =>
   new Parser((pc, s: string) => {
-    const result = pc.resolver.get(parserName).parse(pc, s)
+    if (typeof parser == "string") {
+      parser = pc.resolver.get(parser)
+    }
+    const result = parser.parse(pc, s)
     if (result) {
       return result
     } else {

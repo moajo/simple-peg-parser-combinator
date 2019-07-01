@@ -22,18 +22,17 @@ describe("expression", () => {
   c.add("*/", or("*", "/"))
   c.add("+-", or("+", "-"))
   c.add(
-    "termTail",
-    repeat0(
-      sequence("*/", "factor").map(vs => {
-        return vs[0] == "*"
-          ? (a: number) => a * vs[1]
-          : (a: number) => a / vs[1]
-      })
-    )
-  )
-  c.add(
     "term",
-    sequence("factor", "termTail").map(vs => {
+    sequence(
+      "factor",
+      repeat0(
+        sequence("*/", "factor").map(vs => {
+          return vs[0] == "*"
+            ? (a: number) => a * vs[1]
+            : (a: number) => a / vs[1]
+        })
+      )
+    ).map(vs => {
       let r = vs[0]
       for (let i = 0; i < vs[1].length; i++) {
         r = vs[1][i](r)
