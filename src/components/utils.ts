@@ -5,4 +5,6 @@ import { repeat0 } from "./repeat"
 export const anyCharactorOf = (charactors: string) =>
   or(...Array.from(charactors).map(literal))
 
-export const whitespace = repeat0(anyCharactorOf(" \t\n\r"))
+export const whitespace = repeat0(anyCharactorOf(" \t\n\r")).map(it =>
+  it.join("")
+)

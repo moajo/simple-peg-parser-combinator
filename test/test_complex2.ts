@@ -24,25 +24,29 @@ describe("json", () => {
   c.add(
     "false",
     sequence(whitespace, literal("false").map(_ => false), whitespace).map(
-      vs => vs[1]
+      ([_, value, __]) => value
     )
   )
   c.add(
     "null",
     sequence(whitespace, literal("null").map(_ => null), whitespace).map(
-      vs => vs[1]
+      ([_, value, __]) => value
     )
   )
   c.add(
     "true",
     sequence(whitespace, literal("true").map(_ => true), whitespace).map(
-      vs => vs[1]
+      ([_, value, __]) => value
     )
   )
 
   // 4. object
+  const member = sequence("string", ":", "value").map(([key, _, value]) => ({
+    key,
+    value
+  }))
   const objectValues = zeroOrOne(
-    sequence("member", repeat0(sequence(",", "member").map(vs => vs[1]))).map(
+    sequence(member, repeat0(sequence(",", member).map(vs => vs[1]))).map(
       vs => {
         return [vs[0]].concat(vs[1])
       }
@@ -58,14 +62,6 @@ describe("json", () => {
       })
       return obj
     })
-  )
-
-  c.add(
-    "member",
-    sequence("string", ":", "value").map(vs => ({
-      key: vs[0],
-      value: vs[2]
-    }))
   )
 
   // 5. array

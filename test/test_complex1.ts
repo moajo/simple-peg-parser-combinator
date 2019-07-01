@@ -1,5 +1,6 @@
 import { literal, or, repeat1, repeat0, sequence } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserIdentifier } from "../src/types"
 
 describe("expression", () => {
   const digits = repeat1(
@@ -8,7 +9,7 @@ describe("expression", () => {
         literal(`${i}`).map(s => parseInt(s, 10))
       )
     )
-  ).map(arr => (arr as number[]).reduce((prev, current) => prev * 10 + current))
+  ).map(arr => arr.reduce((prev, current) => prev * 10 + current))
   let c = new ParserResolver()
   c.add("+", literal("+"))
   c.add("-", literal("-"))
@@ -16,47 +17,35 @@ describe("expression", () => {
   c.add("/", literal("/"))
   c.add("(", literal("("))
   c.add(")", literal(")"))
-  c.add("bracedExpression", sequence("(", "expression", ")").map(vs => vs[1]))
-  c.add("factor", or("bracedExpression", digits))
+  const bracedExpression = sequence(
+    "(",
+    "expression" as ParserIdentifier<number>,
+    ")"
+  ).map(([_, exp, __]) => exp)
+  const factor = or(bracedExpression, digits)
 
   c.add("*/", or("*", "/"))
   c.add("+-", or("+", "-"))
-  c.add(
-    "term",
-    sequence(
-      "factor",
-      repeat0(
-        sequence("*/", "factor").map(vs => {
-          return vs[0] == "*"
-            ? (a: number) => a * vs[1]
-            : (a: number) => a / vs[1]
-        })
-      )
-    ).map(vs => {
-      let r = vs[0]
-      for (let i = 0; i < vs[1].length; i++) {
-        r = vs[1][i](r)
-      }
-      return r
-    })
-  )
 
-  c.add(
-    "exprTail1",
-    sequence("+-", "term").map(vs =>
+  const term = sequence(
+    factor,
+    repeat0(
+      sequence("*/", factor).map(([op, num]) =>
+        op == "*" ? (a: number) => a * num : (a: number) => a / num
+      )
+    )
+  ).map(([num, ops]) => ops.reduce((value, op) => op(value), num))
+
+  const exprTail = repeat0(
+    sequence("+-", term).map(vs =>
       vs[0] == "+" ? (a: number) => a + vs[1] : (a: number) => a - vs[1]
     )
   )
-  c.add("exprTail", repeat0("exprTail1"))
   c.add(
     "expression",
-    sequence("term", "exprTail").map(vs => {
-      let r = vs[0]
-      for (let i = 0; i < vs[1].length; i++) {
-        r = vs[1][i](r)
-      }
-      return r
-    })
+    sequence(term, exprTail).map(([num, ops]) =>
+      ops.reduce((value, op) => op(value), num)
+    )
   )
 
   test("digits", () => {
@@ -70,7 +59,6 @@ describe("expression", () => {
   })
 
   test("factor", () => {
-    const factor = c.get("factor")
     const pc = new ParseContext(new ParserCache(), c)
     expect(factor.parse(pc, "1")!.value).toBe(1)
     expect(factor.parse(pc, "(1)")!.value).toBe(1)
@@ -82,7 +70,6 @@ describe("expression", () => {
   })
 
   test("term", () => {
-    const term = c.get("term")
     const pc = new ParseContext(new ParserCache(), c)
     expect(term.parse(pc, "1*1")!.value).toBe(1 * 1)
     expect(term.parse(pc, "3*4/5*(2+4)")!.value).toBe(((3 * 4) / 5) * (2 + 4))
