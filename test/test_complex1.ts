@@ -1,5 +1,5 @@
 import { literal, or, repeat1 } from "../src/index"
-import ParserResolver from "../src/context"
+import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 import { sequenceRuntime } from "../src/components/sequence"
 import { orRuntime } from "../src/components/or"
 import { repeat0Runtime } from "../src/components/repeat"
@@ -66,38 +66,42 @@ describe("expression", () => {
 
   test("digits", () => {
     let digits_ = digits
-    expect(digits_.parse("1")!.value).toBe(1)
-    expect(digits_.parse("0")!.value).toBe(0)
-    expect(digits_.parse("9")!.value).toBe(9)
-    expect(digits_.parse("123")!.value).toBe(123)
-    expect(digits_.parse("99999999999999")!.value).toBe(99999999999999)
-    expect(digits_.parse("aaa")).toBe(null)
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(digits_.parse(pc, "1")!.value).toBe(1)
+    expect(digits_.parse(pc, "0")!.value).toBe(0)
+    expect(digits_.parse(pc, "9")!.value).toBe(9)
+    expect(digits_.parse(pc, "123")!.value).toBe(123)
+    expect(digits_.parse(pc, "99999999999999")!.value).toBe(99999999999999)
+    expect(digits_.parse(pc, "aaa")).toBe(null)
   })
 
   test("factor", () => {
     const factor = c.get("factor")
-    expect(factor.parse("1")!.value).toBe(1)
-    expect(factor.parse("(1)")!.value).toBe(1)
-    expect(factor.parse("((1))")!.value).toBe(1)
-    expect(factor.parse("(1+2)")!.value).toBe(1 + 2)
-    expect(factor.parse("((1)")).toBe(null)
-    expect(factor.parse("1a")!.value).toBe(1)
-    expect(factor.parse("1a")!.length).toBe(1)
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(factor.parse(pc, "1")!.value).toBe(1)
+    expect(factor.parse(pc, "(1)")!.value).toBe(1)
+    expect(factor.parse(pc, "((1))")!.value).toBe(1)
+    expect(factor.parse(pc, "(1+2)")!.value).toBe(1 + 2)
+    expect(factor.parse(pc, "((1)")).toBe(null)
+    expect(factor.parse(pc, "1a")!.value).toBe(1)
+    expect(factor.parse(pc, "1a")!.length).toBe(1)
   })
 
   test("term", () => {
     const term = c.get("term")
-    expect(term.parse("1*1")!.value).toBe(1 * 1)
-    expect(term.parse("3*4/5*(2+4)")!.value).toBe(((3 * 4) / 5) * (2 + 4))
-    expect(term.parse("3*4/5*(2+4")!.value).toBe((3 * 4) / 5)
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(term.parse(pc, "1*1")!.value).toBe(1 * 1)
+    expect(term.parse(pc, "3*4/5*(2+4)")!.value).toBe(((3 * 4) / 5) * (2 + 4))
+    expect(term.parse(pc, "3*4/5*(2+4")!.value).toBe((3 * 4) / 5)
   })
 
   test("expression", () => {
     const expression = c.get("expression")
-    expect(expression.parse("1*1+4")!.value).toBe(1 * 1 + 4)
-    expect(expression.parse("3*4/5*(2+4)+5*(3+7)")!.value).toBe(
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(expression.parse(pc, "1*1+4")!.value).toBe(1 * 1 + 4)
+    expect(expression.parse(pc, "3*4/5*(2+4)+5*(3+7)")!.value).toBe(
       ((3 * 4) / 5) * (2 + 4) + 5 * (3 + 7)
     )
-    expect(expression.parse("3*4/5*6*(2+4")!.value).toBe(((3 * 4) / 5) * 6)
+    expect(expression.parse(pc, "3*4/5*6*(2+4")!.value).toBe(((3 * 4) / 5) * 6)
   })
 })

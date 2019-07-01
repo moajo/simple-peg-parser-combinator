@@ -1,5 +1,5 @@
 import { literal, or, repeat1 } from "../src/index"
-import ParserResolver from "../src/context"
+import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 import { sequenceRuntime, sequence } from "../src/components/sequence"
 import { orRuntime } from "../src/components/or"
 import { zeroOrOne, repeat0, repeat0Runtime } from "../src/components/repeat"
@@ -112,20 +112,22 @@ describe("json", () => {
 
   test("literals", () => {
     let json = c.get("value")
-    expect(json.parse("1")!.value).toBe(1)
-    expect(json.parse('"asd"')!.value).toBe("asd")
-    expect(json.parse("true")!.value).toBe(true)
-    expect(json.parse("false")!.value).toBe(false)
-    expect(json.parse("null")!.value).toBe(null)
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(json.parse(pc, "1")!.value).toBe(1)
+    expect(json.parse(pc, '"asd"')!.value).toBe("asd")
+    expect(json.parse(pc, "true")!.value).toBe(true)
+    expect(json.parse(pc, "false")!.value).toBe(false)
+    expect(json.parse(pc, "null")!.value).toBe(null)
   })
 
   test("array", () => {
     let json = c.get("value")
-    expect(json.parse("[]")!.value).toStrictEqual([])
-    expect(json.parse("[1]")!.value).toStrictEqual([1])
-    expect(json.parse("[1,2,3]")!.value).toStrictEqual([1, 2, 3])
-    expect(json.parse("[1,2,true]")!.value).toStrictEqual([1, 2, true])
-    expect(json.parse('["hoge",2,null]')!.value).toStrictEqual([
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(json.parse(pc, "[]")!.value).toStrictEqual([])
+    expect(json.parse(pc, "[1]")!.value).toStrictEqual([1])
+    expect(json.parse(pc, "[1,2,3]")!.value).toStrictEqual([1, 2, 3])
+    expect(json.parse(pc, "[1,2,true]")!.value).toStrictEqual([1, 2, true])
+    expect(json.parse(pc, '["hoge",2,null]')!.value).toStrictEqual([
       "hoge",
       2,
       null
@@ -134,9 +136,10 @@ describe("json", () => {
 
   test("object", () => {
     const json = c.get("value")
-    expect(json.parse("{}")!.value).toStrictEqual({})
-    expect(json.parse('{"a":2}')!.value).toStrictEqual({ a: 2 })
-    expect(json.parse('{"a":true, "bbb":"hoge"}')!.value).toStrictEqual({
+    const pc = new ParseContext(new ParserCache(), c)
+    expect(json.parse(pc, "{}")!.value).toStrictEqual({})
+    expect(json.parse(pc, '{"a":2}')!.value).toStrictEqual({ a: 2 })
+    expect(json.parse(pc, '{"a":true, "bbb":"hoge"}')!.value).toStrictEqual({
       a: true,
       bbb: "hoge"
     })
@@ -144,8 +147,9 @@ describe("json", () => {
 
   test("complex", () => {
     const json = c.get("JSON")
+    const pc = new ParseContext(new ParserCache(), c)
     expect(
-      json.parse('  {"a":[4,  6, {"ttt":[true,null,45]}], "bbb":"hoge"}  ')!
+      json.parse(pc, '  {"a":[4,  6, {"ttt":[true,null,45]}], "bbb":"hoge"}  ')!
         .value
     ).toStrictEqual({ a: [4, 6, { ttt: [true, null, 45] }], bbb: "hoge" })
   })

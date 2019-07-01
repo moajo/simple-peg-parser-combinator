@@ -2,11 +2,11 @@ import { Parser, ParseResult } from "../types"
 import ParserResolver from "../context"
 
 export const sequence = (...parsers: Parser<any>[]) =>
-  new Parser((s: string) => {
+  new Parser((pc, s: string) => {
     let total = 0
     let values = []
     for (const parser of parsers) {
-      const result = parser.parse(s)
+      const result = parser.parse(pc, s)
       if (result === null) {
         return null
       }
@@ -24,12 +24,12 @@ export const sequenceRuntime = (
   context: ParserResolver,
   ...parsers: string[]
 ) =>
-  new Parser((s: string) => {
+  new Parser((pc, s: string) => {
     let total = 0
     let values = []
     for (const parserName of parsers) {
       const parser = context.get(parserName)
-      const result = parser.parse(s)
+      const result = parser.parse(pc, s)
       if (result === null) {
         return null
       }

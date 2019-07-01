@@ -3,12 +3,12 @@ import ParserResolver from "../context"
 import { ParseResult } from "../types"
 
 export const repeat = (parser: Parser<any>, minCount: number) =>
-  new Parser((s: string) => {
+  new Parser((pc, s: string) => {
     let c = 0
     let total = 0
     let values = []
     while (true) {
-      const result = parser.parse(s)
+      const result = parser.parse(pc, s)
       if (result === null) {
         break
       }
@@ -30,12 +30,12 @@ export const repeatRuntime = (
   parserName: string,
   minCount: number
 ) =>
-  new Parser((s: string) => {
+  new Parser((pc, s: string) => {
     let c = 0
     let total = 0
     let values = []
     while (true) {
-      const result = context.get(parserName).parse(s)
+      const result = context.get(parserName).parse(pc, s)
       if (result === null) {
         break
       }
@@ -68,8 +68,8 @@ export const repeat0Runtime = (c: ParserResolver, parserName: string) =>
   repeatRuntime(c, parserName, 0)
 
 export const zeroOrOne = (context: ParserResolver, parserName: string) =>
-  new Parser((s: string) => {
-    const result = context.get(parserName).parse(s)
+  new Parser((pc, s: string) => {
+    const result = context.get(parserName).parse(pc, s)
     if (result) {
       return result
     } else {

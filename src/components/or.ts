@@ -2,9 +2,9 @@ import { Parser } from "../types"
 import ParserResolver from "../context"
 
 export const or = (...parsers: Parser<any>[]) =>
-  new Parser((s: string) => {
+  new Parser((c, s: string) => {
     for (const parser of parsers) {
-      const result = parser.parse(s)
+      const result = parser.parse(c, s)
       if (result !== null) {
         return result
       }
@@ -13,9 +13,9 @@ export const or = (...parsers: Parser<any>[]) =>
   })
 
 export const orRuntime = (c: ParserResolver, ...parsers: string[]) =>
-  new Parser((s: string) => {
+  new Parser((pc, s: string) => {
     for (const parser of parsers) {
-      const result = c.get(parser).parse(s)
+      const result = c.get(parser).parse(pc, s)
       if (result !== null) {
         return result
       }
