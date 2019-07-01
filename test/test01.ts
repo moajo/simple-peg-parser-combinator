@@ -2,7 +2,6 @@ import { literal, or, sequence, repeat, repeat0, repeat1 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
 test("literal", () => {
-  console.log("@", literal("hoge"))
   const l = literal("hoge")
   const pc = new ParseContext(new ParserCache(), new ParserResolver())
   expect(l.parse(pc, "hoge")!.length).toBe("hoge".length)

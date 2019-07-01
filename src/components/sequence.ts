@@ -1,14 +1,12 @@
 import { Parser, ParseResult, ParserIdentifier } from "../types"
+import { resolveParser } from "../utils"
 
 export const sequence = (...parsers: ParserIdentifier<any>[]) =>
   new Parser((pc, s: string) => {
     let total = 0
     let values = []
     for (let parser of parsers) {
-      if (typeof parser == "string") {
-        parser = pc.resolver.get(parser)
-      }
-      const result = parser.parse(pc, s)
+      const result = resolveParser(parser, pc.resolver).parse(pc, s)
       if (result === null) {
         return null
       }

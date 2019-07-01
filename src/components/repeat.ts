@@ -1,5 +1,6 @@
 import { Parser, ParserIdentifier } from "../types"
 import { ParseResult } from "../types"
+import { resolveParser } from "../utils"
 
 export const repeat = (parserId: ParserIdentifier<any>, minCount: number) =>
   new Parser((pc, s: string) => {
@@ -7,9 +8,7 @@ export const repeat = (parserId: ParserIdentifier<any>, minCount: number) =>
     let total = 0
     let values = []
     while (true) {
-      const parser =
-        typeof parserId === "string" ? pc.resolver.get(parserId) : parserId
-      const result = parser.parse(pc, s)
+      const result = resolveParser(parserId, pc.resolver).parse(pc, s)
       if (result === null) {
         break
       }
@@ -35,10 +34,7 @@ export const repeat0 = (parser: ParserIdentifier<any>) => repeat(parser, 0)
 
 export const zeroOrOne = (parser: ParserIdentifier<any>) =>
   new Parser((pc, s: string) => {
-    if (typeof parser == "string") {
-      parser = pc.resolver.get(parser)
-    }
-    const result = parser.parse(pc, s)
+    const result = resolveParser(parser, pc.resolver).parse(pc, s)
     if (result) {
       return result
     } else {
