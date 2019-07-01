@@ -1,8 +1,7 @@
 import { literal, or, repeat1 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 import { sequenceRuntime, sequence } from "../src/components/sequence"
-import { orRuntime } from "../src/components/or"
-import { zeroOrOne, repeat0, repeat0Runtime } from "../src/components/repeat"
+import { zeroOrOne, repeat0 } from "../src/components/repeat"
 import { whitespace, anyCharactorOf } from "../src/components/utils"
 
 // see: https://github.com/pegjs/pegjs/blob/master/examples/json.pegjs
@@ -24,7 +23,7 @@ describe("json", () => {
 
   c.add(
     "value",
-    orRuntime(c, "false", "null", "true", "object", "array", "number", "string")
+    or("false", "null", "true", "object", "array", "number", "string")
   )
   c.add(
     "false",
@@ -59,7 +58,7 @@ describe("json", () => {
   )
   c.add(
     "objectValues",
-    zeroOrOne(c, "objectValues1").map(v => (v == null ? [] : v))
+    zeroOrOne("objectValues1").map(v => (v == null ? [] : v))
   )
   c.add(
     "objectValues1",
@@ -81,10 +80,7 @@ describe("json", () => {
 
   // 5. array
   c.add("array", sequenceRuntime(c, "[", "arrayValues", "]").map(vs => vs[1]))
-  c.add(
-    "arrayValues",
-    zeroOrOne(c, "arrayValues1").map(v => (v == null ? [] : v))
-  )
+  c.add("arrayValues", zeroOrOne("arrayValues1").map(v => (v == null ? [] : v)))
   c.add(
     "arrayValues1",
     sequenceRuntime(c, "value", "arrayTail").map(vs => [vs[0]].concat(vs[1]))
@@ -106,7 +102,7 @@ describe("json", () => {
     "string",
     sequenceRuntime(c, '"', "chars", '"').map(vs => vs[1].join(""))
   )
-  c.add("chars", repeat0Runtime(c, "char"))
+  c.add("chars", repeat0("char"))
   c.add("char", anyCharactorOf("abcdefghijklmnopqrstuvwyz")) //TODO: more detail
   c.add('"', literal('"'))
 

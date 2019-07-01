@@ -1,8 +1,6 @@
-import { literal, or, repeat1 } from "../src/index"
+import { literal, or, repeat1, repeat0 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 import { sequenceRuntime } from "../src/components/sequence"
-import { orRuntime } from "../src/components/or"
-import { repeat0Runtime } from "../src/components/repeat"
 
 describe("expression", () => {
   const digits = repeat1(
@@ -24,17 +22,17 @@ describe("expression", () => {
     "bracedExpression",
     sequenceRuntime(c, "(", "expression", ")").map(vs => vs[1])
   )
-  c.add("factor", orRuntime(c, "bracedExpression", "digits"))
+  c.add("factor", or("bracedExpression", "digits"))
 
-  c.add("*/", orRuntime(c, "*", "/"))
-  c.add("+-", orRuntime(c, "+", "-"))
+  c.add("*/", or("*", "/"))
+  c.add("+-", or("+", "-"))
   c.add(
     "termTail1",
     sequenceRuntime(c, "*/", "factor").map(vs => {
       return vs[0] == "*" ? (a: number) => a * vs[1] : (a: number) => a / vs[1]
     })
   )
-  c.add("termTail", repeat0Runtime(c, "termTail1"))
+  c.add("termTail", repeat0("termTail1"))
   c.add(
     "term",
     sequenceRuntime(c, "factor", "termTail").map(vs => {
@@ -52,7 +50,7 @@ describe("expression", () => {
       vs[0] == "+" ? (a: number) => a + vs[1] : (a: number) => a - vs[1]
     )
   )
-  c.add("exprTail", repeat0Runtime(c, "exprTail1"))
+  c.add("exprTail", repeat0("exprTail1"))
   c.add(
     "expression",
     sequenceRuntime(c, "term", "exprTail").map(vs => {

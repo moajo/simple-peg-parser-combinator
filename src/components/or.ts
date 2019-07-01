@@ -1,21 +1,12 @@
-import { Parser } from "../types"
-import ParserResolver from "../context"
+import { Parser, ParserIdentifier } from "../types"
 
-export const or = (...parsers: Parser<any>[]) =>
+export const or = (...parsers: ParserIdentifier<any>[]) =>
   new Parser((c, s: string) => {
-    for (const parser of parsers) {
-      const result = parser.parse(c, s)
-      if (result !== null) {
-        return result
+    for (let parser of parsers) {
+      if (typeof parser == "string") {
+        parser = c.resolver.get(parser)
       }
-    }
-    return null
-  })
-
-export const orRuntime = (c: ParserResolver, ...parsers: string[]) =>
-  new Parser((pc, s: string) => {
-    for (const parser of parsers) {
-      const result = c.get(parser).parse(pc, s)
+      const result = parser.parse(c, s)
       if (result !== null) {
         return result
       }

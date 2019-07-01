@@ -1,5 +1,7 @@
 import { ParseContext } from "./context"
 
+export type ParserIdentifier<T> = string | Parser<T>
+
 export type ParseResult<T> = {
   length: number
   value: T
