@@ -8,7 +8,8 @@ import {
   anyChar,
   andPredicate,
   notPredicate,
-  EOF
+  EOF,
+  between
 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
@@ -98,4 +99,15 @@ test("EOF", () => {
   const p = EOF
   expect(p.parse(pc, "")!.length).toBe(0)
   expect(p.parse(pc, "a")).toBe(null)
+})
+
+test("between", () => {
+  const pc = new ParseContext(new ParserCache(), new ParserResolver())
+  const p = between("a", "z")
+  expect(p.parse(pc, "a")!.length).toBe(1)
+  expect(p.parse(pc, "b")!.length).toBe(1)
+  expect(p.parse(pc, "f")!.length).toBe(1)
+  expect(p.parse(pc, "z")!.length).toBe(1)
+  expect(p.parse(pc, String.fromCharCode("a".codePointAt(0)! - 1))).toBe(null)
+  expect(p.parse(pc, String.fromCharCode("z".codePointAt(0)! + 1))).toBe(null)
 })

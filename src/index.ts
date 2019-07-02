@@ -1,7 +1,7 @@
 export { literal } from "./components/literal"
 export { or } from "./components/or"
 export { anyChar } from "./components/any"
-export { EOF } from "./components/utils"
+export * from "./components/utils"
 export { sequence } from "./components/sequence"
 export { repeat, repeat0, repeat1 } from "./components/repeat"
 export { andPredicate, notPredicate } from "./components/predicate"

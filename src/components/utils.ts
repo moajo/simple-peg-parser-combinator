@@ -4,7 +4,7 @@ import { repeat0 } from "./repeat"
 import { Parser } from "../types"
 
 /**
- * match any single charactor that appears in the given string
+ * match any single character that appears in the given string
  * @param charactors
  */
 export const anyCharactorOf = (charactors: string) =>
@@ -26,3 +26,18 @@ export const EOF = new Parser((_, s) => {
   }
   return null
 })
+
+/**
+ * match any single character between startChar and endChar
+ * (INCLUDE startChar,endChar)
+ * @param startChar
+ * @param endChar
+ */
+export const between = (startChar: string, endChar: string) => {
+  const betweenChars: string[] = []
+  const end = endChar.codePointAt(0)!
+  for (let i = startChar.codePointAt(0)!; i <= end; ++i) {
+    betweenChars.push(String.fromCodePoint(i))
+  }
+  return anyCharactorOf(betweenChars.join(""))
+}
