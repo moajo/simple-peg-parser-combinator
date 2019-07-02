@@ -7,7 +7,8 @@ import {
   repeat1,
   anyChar,
   andPredicate,
-  notPredicate
+  notPredicate,
+  EOF
 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
@@ -90,4 +91,11 @@ describe("predicate", () => {
     expect(p.parse(pc, "ba")!.length).toBe(0)
     expect(p.parse(pc, "ab")).toBe(null)
   })
+})
+
+test("EOF", () => {
+  const pc = new ParseContext(new ParserCache(), new ParserResolver())
+  const p = EOF
+  expect(p.parse(pc, "")!.length).toBe(0)
+  expect(p.parse(pc, "a")).toBe(null)
 })
