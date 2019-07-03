@@ -4,16 +4,17 @@ import {
   UnicodeEscapeSequence,
   UnicodeCombiningMark,
   UnicodeDigit,
-  UnicodeConnectorPunctuation
+  UnicodeConnectorPunctuation,
+  dollar,
+  underscore,
+  backslash
 } from "./01.literal"
 import { __, _ } from "./03.spaces"
 
-export const IdentifierStart = or(
-  UnicodeLetter,
-  literal("$"),
-  literal("_"),
-  sequence(literal("\\"), UnicodeEscapeSequence) as any
-)
+export const IdentifierStart = or(UnicodeLetter, dollar, underscore, sequence(
+  backslash,
+  UnicodeEscapeSequence
+) as any)
 export const IdentifierPart = or(
   IdentifierStart,
   UnicodeCombiningMark,

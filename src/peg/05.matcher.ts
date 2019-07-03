@@ -7,13 +7,20 @@ import {
   LineTerminator,
   backslash,
   EscapeSequence,
-  LineContinuation
+  LineContinuation,
+  kokka_l,
+  kakko_l,
+  hyphen,
+  hat,
+  and,
+  exclamation,
+  dot
 } from "./01.literal"
 import { notPredicate } from "../components/predicate"
 
 export const ClassCharacter = or(
   sequence(
-    notPredicate(or(literal("]"), literal("\\"), LineTerminator)),
+    notPredicate(or(kokka_l, backslash, LineTerminator)),
     SourceCharacter
   ),
   sequence(backslash, EscapeSequence),
@@ -22,7 +29,7 @@ export const ClassCharacter = or(
 
 export const ClassCharacterRange = sequence(
   ClassCharacter,
-  literal("-"),
+  hyphen,
   ClassCharacter
 )
 
@@ -30,17 +37,17 @@ export const CharacterPart = or(ClassCharacterRange, ClassCharacter)
 
 // [a-z] 的な記法
 export const CharacterClassMatcher = sequence(
-  literal("["),
-  zeroOrOne(literal("^")),
+  kakko_l,
+  zeroOrOne(hat),
   repeat0(CharacterPart) as any,
-  literal("]"),
+  kokka_l,
   zeroOrOne(literal("i"))
 )
 
 // -------------------
 export const SemanticPredicateOperator = or(
-  literal("&").map(_ => "semantic_and"),
-  literal("!").map(_ => "semantic_not")
+  and.map(_ => "semantic_and"),
+  exclamation.map(_ => "semantic_not")
 )
 
-export const AnyMatcher = literal(".")
+export const AnyMatcher = dot

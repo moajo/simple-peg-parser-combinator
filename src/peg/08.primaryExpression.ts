@@ -1,10 +1,7 @@
-import { literal, or } from "../index"
-import { sequence } from "../components/sequence"
-import { zeroOrOne } from "../components/repeat"
+import { or, notPredicate, zeroOrOne, sequence } from "../index"
 import { _, __ } from "./03.spaces"
-import { kakko_s, kokka_s } from "./01.literal"
+import { kakko_s, kokka_s, equal } from "./01.literal"
 import { Identifier } from "./04.identifier"
-import { notPredicate } from "../components/predicate"
 import { StringLiteral, LiteralMatcher } from "./05.string"
 import { CodeBlock } from "./01.1.codeblock"
 import {
@@ -15,9 +12,7 @@ import {
 
 export const RuleReferenceExpression = sequence(
   Identifier,
-  notPredicate(
-    sequence(__, zeroOrOne(sequence(StringLiteral, __)), literal("="))
-  )
+  notPredicate(sequence(__, zeroOrOne(sequence(StringLiteral, __)), equal))
 )
 
 export const SemanticPredicateExpression = sequence(

@@ -2,7 +2,7 @@ import { literal, or } from "../index"
 import { sequence } from "../components/sequence"
 import { zeroOrOne, repeat0, repeat1 } from "../components/repeat"
 import { _, __, EOS } from "./03.spaces"
-import { dollar, and } from "./01.literal"
+import { dollar, and, atmark, slash, equal } from "./01.literal"
 import { Identifier } from "./04.identifier"
 import { StringLiteral } from "./05.string"
 import { CodeBlock } from "./01.1.codeblock"
@@ -49,7 +49,7 @@ export const PrefixedExpression = or(
 
 export const LabeledExpression = or(
   sequence(
-    literal("@"),
+    atmark,
     zeroOrOne(LabelIdentifier) as any,
     __ as any,
     PrefixedExpression as any
@@ -74,7 +74,7 @@ export const ActionExpression = sequence(
 
 export const ChoiceExpression = sequence(
   ActionExpression,
-  repeat0(sequence(__, literal("/") as any, __, ActionExpression as any))
+  repeat0(sequence(__, slash as any, __, ActionExpression as any))
 ).map(a => {
   // if ( tail.length === 0 ) return head;
   // return createNode( "choice", {
@@ -89,7 +89,7 @@ export const Rule = sequence(
   Identifier,
   __ as any,
   zeroOrOne(sequence(StringLiteral, __)) as any,
-  literal("=") as any,
+  equal as any,
   __ as any,
   Expression as any,
   EOS as any

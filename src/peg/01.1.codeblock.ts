@@ -1,7 +1,5 @@
-import { or, sequence } from "../index"
-import { notPredicate } from "../components/predicate"
+import { or, sequence, repeat0, repeat1, notPredicate } from "../index"
 import { kakko_m, kokka_m, SourceCharacter } from "./01.literal"
-import { repeat0, repeat1 } from "../components/repeat"
 
 export const Code = repeat0(
   or(
