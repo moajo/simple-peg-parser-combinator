@@ -29,4 +29,8 @@ export class Parser<T> {
         : null
     })
   }
+
+  mapTo<U>(value: U): Parser<U> {
+    return this.map(_ => value)
+  }
 }
