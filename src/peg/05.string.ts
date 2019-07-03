@@ -16,13 +16,14 @@ import {
   double_quote
 } from "./01.literal"
 import { __, _ } from "./03.spaces"
+import { pickSecond, pickCenter } from "../utils"
 
 export const DoubleStringCharacter = or(
   sequence(
     notPredicate(or(double_quote, backslash, LineTerminator)),
     SourceCharacter
-  ),
-  sequence(backslash, EscapeSequence),
+  ).map(pickSecond),
+  sequence(backslash, EscapeSequence).map(pickSecond),
   LineContinuation
 )
 
@@ -30,14 +31,22 @@ export const SingleStringCharacter = or(
   sequence(
     notPredicate(or(single_quote, backslash, LineTerminator)),
     SourceCharacter
-  ),
-  sequence(backslash, EscapeSequence),
+  ).map(pickSecond),
+  sequence(backslash, EscapeSequence).map(pickSecond),
   LineContinuation
 )
 
 export const StringLiteral = or(
-  sequence(double_quote, repeat0(DoubleStringCharacter), double_quote),
-  sequence(single_quote, repeat0(SingleStringCharacter), single_quote)
+  sequence(
+    double_quote,
+    repeat0(DoubleStringCharacter).map(a => a.join("")),
+    double_quote
+  ).map(pickCenter),
+  sequence(
+    single_quote,
+    repeat0(SingleStringCharacter).map(a => a.join("")),
+    single_quote
+  ).map(pickCenter)
 )
 
 export const LiteralMatcher = sequence(

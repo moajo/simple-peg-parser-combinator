@@ -2,6 +2,7 @@ import { literal, or, sequence, anyChar } from "../index"
 import { Zs, Lu, Ll, Lt, Lm, Lo, Nl, Mn, Mc, Nd, Pc } from "./00.unicode"
 import { between } from "../components/utils"
 import { notPredicate } from "../components/predicate"
+import { pickSecond } from "../utils"
 
 export const dollar = literal("$")
 export const and = literal("&")
@@ -89,12 +90,14 @@ export const EscapeCharacter = or(
   literal("u")
 )
 
-export const LineContinuation = sequence(backslash, LineTerminatorSequence)
+export const LineContinuation = sequence(backslash, LineTerminatorSequence).map(
+  _ => ""
+)
 
 export const NonEscapeCharacter = sequence(
   notPredicate(or(EscapeCharacter, LineTerminator)),
   SourceCharacter
-)
+).map(pickSecond)
 export const CharacterEscapeSequence = or(
   SingleEscapeCharacter,
   NonEscapeCharacter
@@ -113,7 +116,7 @@ export const UnicodeEscapeSequence = sequence(
 
 export const EscapeSequence = or(
   CharacterEscapeSequence,
-  sequence(literal("0"), notPredicate(DecimalDigit)),
+  sequence(literal("0"), notPredicate(DecimalDigit)).map(_ => "\0"),
   HexEscapeSequence,
   UnicodeEscapeSequence
 )
