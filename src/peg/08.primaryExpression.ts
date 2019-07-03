@@ -10,7 +10,9 @@ import {
   AnyMatcher
 } from "./05.matcher"
 import { pickFirst } from "../utils"
-import { RuleReferenceNode } from "./ast"
+import { RuleReferenceNode, SemanticPredicateNode, ExpressionNode } from "./ast"
+import { ParserIdentifier } from "../types"
+import { Expression } from "@babel/types"
 
 export const RuleReferenceExpression = sequence(
   Identifier,
@@ -23,7 +25,7 @@ export const SemanticPredicateExpression = sequence(
   SemanticPredicateOperator,
   __,
   CodeBlock
-)
+).map(([a, _, c]) => new SemanticPredicateNode(a, c))
 
 export const PrimaryExpression = or(
   LiteralMatcher,
@@ -31,7 +33,13 @@ export const PrimaryExpression = or(
   AnyMatcher,
   RuleReferenceExpression,
   SemanticPredicateExpression,
-  sequence(kakko_s, __, "Expression", __, kokka_s)
+  sequence(
+    kakko_s,
+    __,
+    "Expression" as ParserIdentifier<ExpressionNode>,
+    __,
+    kokka_s
+  ).map(a => a[2])
 ).map(a => {
   // // The purpose of the "group" AST node is just to isolate label scope. We
   // // don't need to put it around nodes that can't contain any labels or

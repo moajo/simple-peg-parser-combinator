@@ -1,11 +1,16 @@
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression } from "../src/peg/09.grammer"
+import { Grammar, Expression, Rule } from "../src/peg/09.grammer"
 import * as fs from "fs"
 import { StringLiteral, LiteralMatcher } from "../src/peg/05.string"
 import {
   LiteralMatcherNode,
   AnyMatcherNode,
-  RuleReferenceNode
+  RuleReferenceNode,
+  GrammerNode,
+  RuleNode,
+  ZeroOrMoreExpressionNode,
+  CharacterClassMatcherExpressionNode,
+  CharactorNode
 } from "../src/peg/ast"
 import {
   PrimaryExpression,
@@ -76,12 +81,53 @@ describe("PrimaryExpression", () => {
   })
 })
 
-test("grammar", () => {
+describe("rule", () => {
+  const pr = new ParserResolver()
+  pr.add("Expression", Expression)
+  pr.add("Code", Code)
+
+  describe("whitespace", () => {
+    const pc = new ParseContext(new ParserCache(), pr)
+    const rule_whitespace = new RuleNode(
+      "_",
+      new ZeroOrMoreExpressionNode(
+        new CharacterClassMatcherExpressionNode(false, false, [
+          new CharactorNode(" "),
+          new CharactorNode("\t"),
+          new CharactorNode("\n"),
+          new CharactorNode("\r")
+        ])
+      ),
+      "whitespace"
+    )
+
+    const input =
+      ' Integer "integer" = _ [0-9]+ { return parseInt(text(), 10); }    '
+
+    expect(Rule.parse(pc, input)!).toStrictEqual(rule_whitespace)
+    // expect(Grammar.parse(pc, "hogea")!.length).toBe("hoge".length)
+    // expect(Grammar.parse(pc, "fuga")).toBe(null)
+  })
+})
+
+test.skip("grammar", () => {
+  // const rule_expression = new RuleNode("Expression", new ExpressionNode())
+  // const rule_term = new RuleNode("Term", new ExpressionNode())
+  // const rule_factor = new RuleNode("Factor", new ExpressionNode())
+  // const rule_integer = new RuleNode("Integer", new ExpressionNode(), "integer")
+  // const rule_whitespace = new RuleNode(
+  //   "_",
+  //   new ZeroOrMoreExpressionNode(
+  //     new CharacterClassMatcherExpressionNode([" ", "\t", "\n", "\r"])
+  //   ),
+  //   "whitespace"
+  // )
+
   const pr = new ParserResolver()
   pr.add("Expression", Expression)
   pr.add("Code", Code)
   const pc = new ParseContext(new ParserCache(), pr)
-  expect(Grammar.parse(pc, arithmetics_src)!).not.toBe(null)
+  expect(Grammar.parse(pc, arithmetics_src)!).toStrictEqual(new GrammerNode([]))
   // expect(Grammar.parse(pc, "hogea")!.length).toBe("hoge".length)
   // expect(Grammar.parse(pc, "fuga")).toBe(null)
 })

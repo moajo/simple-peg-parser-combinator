@@ -17,33 +17,41 @@ import {
   dot
 } from "./01.literal"
 import { notPredicate } from "../components/predicate"
-import { AnyMatcherNode } from "./ast"
+import {
+  AnyMatcherNode,
+  CharacterClassMatcherExpressionNode,
+  CharactorNode,
+  CharactorRangeNode
+} from "./ast"
+import { pickSecond } from "../utils"
 
 export const ClassCharacter = or(
   sequence(
     notPredicate(or(kokka_l, backslash, LineTerminator)),
     SourceCharacter
-  ),
-  sequence(backslash, EscapeSequence),
+  ).map(pickSecond),
+  sequence(backslash, EscapeSequence).map(pickSecond),
   LineContinuation
-)
+).map(char => new CharactorNode(char))
 
 export const ClassCharacterRange = sequence(
   ClassCharacter,
   hyphen,
   ClassCharacter
-)
+).map(([s, _, e]) => new CharactorRangeNode(s.char, e.char))
 
 export const CharacterPart = or(ClassCharacterRange, ClassCharacter)
 
 // [a-z] 的な記法
 export const CharacterClassMatcher = sequence(
   kakko_l,
-  zeroOrOne(hat),
-  repeat0(CharacterPart) as any,
+  zeroOrOne(hat).map(a => a != null),
+  repeat0(CharacterPart),
   kokka_l,
-  zeroOrOne(literal("i"))
-)
+  zeroOrOne(literal("i")).map(a => a != null)
+).map(([_, inverted, parts, __, ignoreCase]) => {
+  return new CharacterClassMatcherExpressionNode(inverted, ignoreCase, parts)
+})
 
 // -------------------
 export const SemanticPredicateOperator = or(

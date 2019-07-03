@@ -32,6 +32,15 @@ export function sequence<T1, T2, T3, T4, T5, T6>(
   p5: ParserIdentifier<T5>,
   p6: ParserIdentifier<T6>
 ): Parser<[T1, T2, T3, T4, T5, T6]>
+export function sequence<T1, T2, T3, T4, T5, T6, T7>(
+  p1: ParserIdentifier<T1>,
+  p2: ParserIdentifier<T2>,
+  p3: ParserIdentifier<T3>,
+  p4: ParserIdentifier<T4>,
+  p5: ParserIdentifier<T5>,
+  p6: ParserIdentifier<T6>,
+  p7: ParserIdentifier<T7>
+): Parser<[T1, T2, T3, T4, T5, T6, T7]>
 
 export function sequence<T>(...parsers: ParserIdentifier<T>[]): Parser<T[]>
 export function sequence(...parsers: ParserIdentifier<any>[]): Parser<any[]>

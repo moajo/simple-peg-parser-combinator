@@ -2,35 +2,41 @@ import { literal, or } from "../index"
 import { sequence } from "../components/sequence"
 import { zeroOrOne, repeat0, repeat1 } from "../components/repeat"
 import { _, __, EOS } from "./03.spaces"
-import { dollar, and, atmark, slash, equal } from "./01.literal"
+import {
+  dollar,
+  and,
+  atmark,
+  slash,
+  equal,
+  exclamation,
+  question,
+  star,
+  plus
+} from "./01.literal"
 import { Identifier } from "./04.identifier"
 import { StringLiteral } from "./05.string"
 import { CodeBlock } from "./01.1.codeblock"
 import { PrimaryExpression } from "./08.primaryExpression"
 import { Initializer } from "./03.1.initializer"
+import { pickFirst } from "../utils"
+import { SuffixedOperatorEnum, PrefixedOperatorEnum } from "./ast"
 
 export const PrefixedOperator = or(
-  dollar.map(_ => "text"),
-  and.map(_ => "simple_and"),
-  literal("!").map(_ => "simple_not")
+  dollar.mapTo(PrefixedOperatorEnum.TEXT),
+  and.mapTo(PrefixedOperatorEnum.SIMPLE_AND),
+  exclamation.mapTo(PrefixedOperatorEnum.SIMPLE_NOT)
 )
 
 export const SuffixedOperator = or(
-  literal("?").map(_ => {
-    return "optional"
-  }),
-  literal("*").map(_ => {
-    return "zero_or_more"
-  }),
-  literal("+").map(_ => {
-    return "one_or_more"
-  })
+  question.mapTo(SuffixedOperatorEnum.OPTIONAL),
+  star.mapTo(SuffixedOperatorEnum.ZERO_OR_MORE),
+  plus.mapTo(SuffixedOperatorEnum.ONE_OR_MORE)
 )
 
 export const SuffixedExpression = or(
   sequence(PrimaryExpression, __, SuffixedOperator),
   PrimaryExpression
-)
+).map()
 
 export const LabelIdentifier = sequence(Identifier, __, literal(":")).map(a => {
   // if ( RESERVED_WORDS[ name ] !== true ) return name;
@@ -48,12 +54,7 @@ export const PrefixedExpression = or(
 )
 
 export const LabeledExpression = or(
-  sequence(
-    atmark,
-    zeroOrOne(LabelIdentifier) as any,
-    __ as any,
-    PrefixedExpression as any
-  ),
+  sequence(atmark, zeroOrOne(LabelIdentifier), __, PrefixedExpression),
   sequence(LabelIdentifier, __, PrefixedExpression),
   PrefixedExpression
 )
@@ -87,12 +88,12 @@ export const Expression = ChoiceExpression
 
 export const Rule = sequence(
   Identifier,
-  __ as any,
-  zeroOrOne(sequence(StringLiteral, __)) as any,
-  equal as any,
-  __ as any,
-  Expression as any,
-  EOS as any
+  __,
+  zeroOrOne(sequence(StringLiteral, __).map(pickFirst)),
+  equal,
+  __,
+  Expression,
+  EOS
 ).map(a => {
   // if ( displayName )
 
