@@ -23,4 +23,7 @@ export const IdentifierPart = or(
   literal("\u200C"),
   literal("\u200D")
 )
-export const Identifier = sequence(IdentifierStart, repeat0(IdentifierPart))
+export const Identifier = sequence(
+  IdentifierStart,
+  repeat0(IdentifierPart)
+).map(([head, tail]) => [head, ...tail].join(""))

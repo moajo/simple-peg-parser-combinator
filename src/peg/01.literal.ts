@@ -90,9 +90,10 @@ export const EscapeCharacter = or(
   literal("u")
 )
 
-export const LineContinuation = sequence(backslash, LineTerminatorSequence).map(
-  _ => ""
-)
+export const LineContinuation = sequence(
+  backslash,
+  LineTerminatorSequence
+).mapTo("")
 
 export const NonEscapeCharacter = sequence(
   notPredicate(or(EscapeCharacter, LineTerminator)),

@@ -17,6 +17,7 @@ import {
   dot
 } from "./01.literal"
 import { notPredicate } from "../components/predicate"
+import { AnyMatcherNode } from "./ast"
 
 export const ClassCharacter = or(
   sequence(
@@ -50,4 +51,4 @@ export const SemanticPredicateOperator = or(
   exclamation.map(_ => "semantic_not")
 )
 
-export const AnyMatcher = dot
+export const AnyMatcher = dot.map(_ => new AnyMatcherNode())

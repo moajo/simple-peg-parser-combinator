@@ -9,11 +9,15 @@ import {
   CharacterClassMatcher,
   AnyMatcher
 } from "./05.matcher"
+import { pickFirst } from "../utils"
+import { RuleReferenceNode } from "./ast"
 
 export const RuleReferenceExpression = sequence(
   Identifier,
   notPredicate(sequence(__, zeroOrOne(sequence(StringLiteral, __)), equal))
 )
+  .map(pickFirst)
+  .map(name => new RuleReferenceNode(name))
 
 export const SemanticPredicateExpression = sequence(
   SemanticPredicateOperator,
@@ -23,11 +27,11 @@ export const SemanticPredicateExpression = sequence(
 
 export const PrimaryExpression = or(
   LiteralMatcher,
-  CharacterClassMatcher as any,
-  AnyMatcher as any,
-  RuleReferenceExpression as any,
-  SemanticPredicateExpression as any,
-  sequence(kakko_s, __ as any, "Expression", __ as any, kokka_s) as any
+  CharacterClassMatcher,
+  AnyMatcher,
+  RuleReferenceExpression,
+  SemanticPredicateExpression,
+  sequence(kakko_s, __, "Expression", __, kokka_s)
 ).map(a => {
   // // The purpose of the "group" AST node is just to isolate label scope. We
   // // don't need to put it around nodes that can't contain any labels or

@@ -976,7 +976,7 @@ export const Lt = or(
   between("\u1FA8", "\u1FAF"),
   literal("\u1FBC"),
   literal("\u1FCC"),
-  "\u1FFC"
+  literal("\u1FFC")
 )
 
 // Letter, Uppercase
@@ -1688,7 +1688,7 @@ export const Mc = or(
   between("\uABE3", "\uABE4"),
   between("\uABE6", "\uABE7"),
   between("\uABE9", "\uABEA"),
-  "\uABEC"
+  literal("\uABEC")
 )
 
 // Mark, Nonspacing
@@ -1962,7 +1962,7 @@ export const Pc = or(
   literal("\u2054"),
   between("\uFE33", "\uFE34"),
   between("\uFE4D", "\uFE4F"),
-  "\uFF3F"
+  literal("\uFF3F")
 )
 
 // Separator, Space
@@ -1973,5 +1973,5 @@ export const Zs = or(
   between("\u2000", "\u200A"),
   literal("\u202F"),
   literal("\u205F"),
-  "\u3000"
+  literal("\u3000")
 )
