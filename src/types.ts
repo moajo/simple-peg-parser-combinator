@@ -33,4 +33,13 @@ export class Parser<T> {
   mapTo<U>(value: U): Parser<U> {
     return this.map(_ => value)
   }
+
+  debug(message: string): Parser<T> {
+    return new Parser((c, s) => {
+      console.log("@debug: " + message)
+      const res = this.parser(c, s)
+      console.log("@debug ok: " + message)
+      return res
+    })
+  }
 }
