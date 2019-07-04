@@ -34,10 +34,15 @@ export const EOF = new Parser((_, s) => {
  * @param endChar
  */
 export const between = (startChar: string, endChar: string) => {
-  const betweenChars: string[] = []
+  const start = startChar.codePointAt(0)!
   const end = endChar.codePointAt(0)!
-  for (let i = startChar.codePointAt(0)!; i <= end; ++i) {
-    betweenChars.push(String.fromCodePoint(i))
-  }
-  return anyCharactorOf(betweenChars.join(""))
+  return new Parser((_, s) => {
+    if (s.length >= 1) {
+      const codePoint = s.codePointAt(0)!
+      if (start <= codePoint && codePoint <= end) {
+        return { length: 1, value: s[0] }
+      }
+    }
+    return null
+  })
 }
