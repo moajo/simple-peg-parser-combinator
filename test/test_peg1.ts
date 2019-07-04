@@ -42,7 +42,7 @@ test("string literal", () => {
   )
 })
 
-describe.skip("matchers", () => {
+describe("matchers", () => {
   describe("CharacterClassMatcher", () => {
     test("CharacterClassMatcher", () => {
       const pc = new ParseContext(new ParserCache(), new ParserResolver())
@@ -156,11 +156,11 @@ const rule_term = new RuleNode(
       )
     ]),
     String.raw`
-        return tail.reduce(function(result, element) {
-          if (element[0] === "*") return result * element[1];
-          if (element[0] === "/") return result / element[1];
-        }, head);
-      `
+      return tail.reduce(function(result, element) {
+        if (element[0] === "*") return result * element[1];
+        if (element[0] === "/") return result / element[1];
+      }, head);
+    `
   )
 )
 
@@ -191,13 +191,21 @@ const rule_expression = new RuleNode(
       )
     ]),
     String.raw`
-        return tail.reduce(function(result, element) {
-          if (element[0] === "+") return result + element[1];
-          if (element[0] === "-") return result - element[1];
-        }, head);
-      `
+      return tail.reduce(function(result, element) {
+        if (element[0] === "+") return result + element[1];
+        if (element[0] === "-") return result - element[1];
+      }, head);
+    `
   )
 )
+
+const rule_grammer = new GrammerNode([
+  rule_expression,
+  rule_term,
+  rule_factor,
+  rule_integer,
+  rule_whitespace
+])
 
 describe("rule", () => {
   const pr = new ParserResolver()
@@ -226,45 +234,31 @@ describe("rule", () => {
   test("term", () => {
     const pc = new ParseContext(new ParserCache(), pr)
     const input = String.raw`Term
-    = head:Factor tail:(_ @("*" / "/") _ @Factor)* {
-        return tail.reduce(function(result, element) {
-          if (element[0] === "*") return result * element[1];
-          if (element[0] === "/") return result / element[1];
-        }, head);
-      }`
+  = head:Factor tail:(_ @("*" / "/") _ @Factor)* {
+      return tail.reduce(function(result, element) {
+        if (element[0] === "*") return result * element[1];
+        if (element[0] === "/") return result / element[1];
+      }, head);
+    }`
     expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_term)
   })
   test("expression", () => {
     const pc = new ParseContext(new ParserCache(), pr)
     const input = String.raw`Expression
-    = head:Term tail:(_ @("+" / "-") _ @Term)* {
-        return tail.reduce(function(result, element) {
-          if (element[0] === "+") return result + element[1];
-          if (element[0] === "-") return result - element[1];
-        }, head);
-      }`
+  = head:Term tail:(_ @("+" / "-") _ @Term)* {
+      return tail.reduce(function(result, element) {
+        if (element[0] === "+") return result + element[1];
+        if (element[0] === "-") return result - element[1];
+      }, head);
+    }`
     expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_expression)
   })
 })
 
-test.skip("grammar", () => {
-  // const rule_expression = new RuleNode("Expression", new ExpressionNode())
-  // const rule_term = new RuleNode("Term", new ExpressionNode())
-  // const rule_factor = new RuleNode("Factor", new ExpressionNode())
-  // const rule_integer = new RuleNode("Integer", new ExpressionNode(), "integer")
-  // const rule_whitespace = new RuleNode(
-  //   "_",
-  //   new ZeroOrMoreExpressionNode(
-  //     new CharacterClassMatcherExpressionNode([" ", "\t", "\n", "\r"])
-  //   ),
-  //   "whitespace"
-  // )
-
+test("grammar", () => {
   const pr = new ParserResolver()
+  const pc = new ParseContext(new ParserCache(), pr)
   pr.add("Expression", Expression)
   pr.add("Code", Code)
-  const pc = new ParseContext(new ParserCache(), pr)
-  expect(Grammar.parse(pc, arithmetics_src)!).toStrictEqual(new GrammerNode([]))
-  // expect(Grammar.parse(pc, "hogea")!.length).toBe("hoge".length)
-  // expect(Grammar.parse(pc, "fuga")).toBe(null)
+  expect(Grammar.parse(pc, arithmetics_src)!.value).toStrictEqual(rule_grammer)
 })
