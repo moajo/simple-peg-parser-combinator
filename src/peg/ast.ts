@@ -8,6 +8,7 @@ export enum PrefixedOperatorEnum {
   SIMPLE_AND,
   SIMPLE_NOT
 }
+
 export class Node {}
 
 export class LiteralMatcherNode {
@@ -47,12 +48,50 @@ export class CharacterClassMatcherExpressionNode extends ExpressionNode {
   }
 }
 
+export class SuffixExpressionNode extends ExpressionNode {
+  constructor(
+    public suffixOperator: SuffixedOperatorEnum,
+    public expression: ExpressionNode
+  ) {
+    super()
+  }
+}
+export class PrefixExpressionNode extends ExpressionNode {
+  constructor(
+    public prefixOperator: PrefixedOperatorEnum,
+    public expression: ExpressionNode
+  ) {
+    super()
+  }
+}
+
+export class LabeledExpressionNode extends ExpressionNode {
+  constructor(
+    public atmark: boolean,
+    public label: string,
+    public expression: ExpressionNode
+  ) {
+    super()
+  }
+}
+
+export class SequenceExpressionNode extends ExpressionNode {
+  constructor(public children: ExpressionNode[]) {
+    super()
+  }
+}
+export class ActionExpressionNode extends ExpressionNode {
+  constructor(public child: ExpressionNode, public actionCode: string) {
+    super()
+  }
+}
+
 export class ZeroOrMoreExpressionNode extends ExpressionNode {
   constructor(public child: ExpressionNode) {
     super()
   }
 }
-export class OrExpressionNode extends ExpressionNode {
+export class ChoiceExpressionNode extends ExpressionNode {
   constructor(public children: ExpressionNode[]) {
     super()
   }

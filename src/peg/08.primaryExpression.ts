@@ -12,7 +12,6 @@ import {
 import { pickFirst } from "../utils"
 import { RuleReferenceNode, SemanticPredicateNode, ExpressionNode } from "./ast"
 import { ParserIdentifier } from "../types"
-import { Expression } from "@babel/types"
 
 export const RuleReferenceExpression = sequence(
   Identifier,
@@ -48,5 +47,5 @@ export const PrimaryExpression = or(
 
   // // This leaves us with "labeled" and "sequence".
   // return createNode( "group", { expression: e } );
-  return a
+  return a as ExpressionNode
 })

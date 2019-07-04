@@ -18,8 +18,19 @@ import { StringLiteral } from "./05.string"
 import { CodeBlock } from "./01.1.codeblock"
 import { PrimaryExpression } from "./08.primaryExpression"
 import { Initializer } from "./03.1.initializer"
-import { pickFirst } from "../utils"
-import { SuffixedOperatorEnum, PrefixedOperatorEnum } from "./ast"
+import { pickFirst, pickSecond } from "../utils"
+import {
+  SuffixedOperatorEnum,
+  PrefixedOperatorEnum,
+  SuffixExpressionNode,
+  PrefixExpressionNode,
+  RuleNode,
+  LabeledExpressionNode,
+  SequenceExpressionNode,
+  ActionExpressionNode,
+  ChoiceExpressionNode,
+  GrammerNode
+} from "./ast"
 
 export const PrefixedOperator = or(
   dollar.mapTo(PrefixedOperatorEnum.TEXT),
@@ -34,55 +45,57 @@ export const SuffixedOperator = or(
 )
 
 export const SuffixedExpression = or(
-  sequence(PrimaryExpression, __, SuffixedOperator),
+  sequence(PrimaryExpression, __, SuffixedOperator).map(
+    ([a, _, c]) => new SuffixExpressionNode(c, a)
+  ),
   PrimaryExpression
-).map()
+).map(a => {
+  return a
+})
 
 export const LabelIdentifier = sequence(Identifier, __, literal(":")).map(a => {
   // if ( RESERVED_WORDS[ name ] !== true ) return name;
 
   // error( `Label can't be a reserved word "${ name }".`, location() );
-  return a
+  return a[0]
 })
 
 export const PrefixedExpression = or(
-  sequence(PrefixedOperator, __, SuffixedExpression).map(a => {
-    //return createNode( operator, { expression } );
-    return a
-  }),
+  sequence(PrefixedOperator, __, SuffixedExpression).map(
+    ([c, _, a]) => new PrefixExpressionNode(c, a)
+  ),
   SuffixedExpression
 )
 
 export const LabeledExpression = or(
-  sequence(atmark, zeroOrOne(LabelIdentifier), __, PrefixedExpression),
-  sequence(LabelIdentifier, __, PrefixedExpression),
+  sequence(atmark, zeroOrOne(LabelIdentifier), __, PrefixedExpression).map(
+    ([_, a, __, b]) => new LabeledExpressionNode(true, a === null ? "" : a, b)
+  ),
+  sequence(LabelIdentifier, __, PrefixedExpression).map(
+    ([a, _, b]) => new LabeledExpressionNode(false, a, b)
+  ),
   PrefixedExpression
 )
 
 export const SequenceExpression = sequence(
   LabeledExpression,
-  repeat0(sequence(__, LabeledExpression))
-)
+  repeat0(sequence(__, LabeledExpression).map(pickSecond))
+).map(([a, b]) => {
+  if (b.length != 0) {
+    return new SequenceExpressionNode([a, ...b])
+  }
+  return a
+})
 
 export const ActionExpression = sequence(
   SequenceExpression,
-  zeroOrOne(sequence(__, CodeBlock))
-).map(a => {
-  // if ( code === null ) return expression;
-  // return createNode( "action", { expression, code } );
-  return a
-})
+  zeroOrOne(sequence(__, CodeBlock).map(pickSecond))
+).map(([a, b]) => (b === null ? a : new ActionExpressionNode(a, b)))
 
 export const ChoiceExpression = sequence(
   ActionExpression,
-  repeat0(sequence(__, slash as any, __, ActionExpression as any))
-).map(a => {
-  // if ( tail.length === 0 ) return head;
-  // return createNode( "choice", {
-  //     alternatives: [ head ].concat( tail ),
-  // } );
-  return a
-})
+  repeat0(sequence(__, slash, __, ActionExpression).map(([_, _a, __, b]) => b))
+).map(([a, b]) => (b.length === 0 ? a : new ChoiceExpressionNode([a, ...b])))
 
 export const Expression = ChoiceExpression
 
@@ -94,22 +107,19 @@ export const Rule = sequence(
   __,
   Expression,
   EOS
-).map(a => {
-  // if ( displayName )
-
-  //     expression = createNode( "named", {
-  //         name: displayName,
-  //         expression: expression,
-  //     } );
-
-  // return createNode( "rule", { name, expression } );
-  return a
-})
+).map(([name, _, displayName, __, ___, expression, ____]) =>
+  displayName === null
+    ? new RuleNode(name, expression)
+    : new RuleNode(name, expression, displayName)
+)
 export const Grammar = sequence(
   __,
-  zeroOrOne(sequence(Initializer, __)),
-  repeat1(sequence(Rule, __))
-).map(a => {
-  // return new ast.Grammar( initializer, rules, comments, location() );
-  return a
+  zeroOrOne(sequence(Initializer, __).map(pickFirst)),
+  repeat1(sequence(Rule, __).map(pickFirst))
+).map(([_, init, rules]) => {
+  if (init === null) {
+    return new GrammerNode(rules)
+  } else {
+    throw new Error("wip")
+  }
 })

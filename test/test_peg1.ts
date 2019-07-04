@@ -8,9 +8,15 @@ import {
   RuleReferenceNode,
   GrammerNode,
   RuleNode,
-  ZeroOrMoreExpressionNode,
   CharacterClassMatcherExpressionNode,
-  CharactorNode
+  CharactorNode,
+  SuffixExpressionNode,
+  SuffixedOperatorEnum,
+  ActionExpressionNode,
+  SequenceExpressionNode,
+  CharactorRangeNode,
+  ChoiceExpressionNode,
+  LabeledExpressionNode
 } from "../src/peg/ast"
 import {
   PrimaryExpression,
@@ -81,32 +87,163 @@ describe("PrimaryExpression", () => {
   })
 })
 
+const rule_whitespace = new RuleNode(
+  "_",
+  new SuffixExpressionNode(
+    SuffixedOperatorEnum.ZERO_OR_MORE,
+    new CharacterClassMatcherExpressionNode(false, false, [
+      new CharactorNode(" "),
+      new CharactorNode("\t"),
+      new CharactorNode("\n"),
+      new CharactorNode("\r")
+    ])
+  ),
+  "whitespace"
+)
+const rule_integer = new RuleNode(
+  "Integer",
+  new ActionExpressionNode(
+    new SequenceExpressionNode([
+      new RuleReferenceNode("_"),
+      new SuffixExpressionNode(
+        SuffixedOperatorEnum.ONE_OR_MORE,
+        new CharacterClassMatcherExpressionNode(false, false, [
+          new CharactorRangeNode("0", "9")
+        ])
+      )
+    ]),
+    " return parseInt(text(), 10); "
+  ),
+  "integer"
+)
+const rule_factor = new RuleNode(
+  "Factor",
+  new ChoiceExpressionNode([
+    new SequenceExpressionNode([
+      new LiteralMatcherNode("(", false),
+      new RuleReferenceNode("_"),
+      new LabeledExpressionNode(true, "", new RuleReferenceNode("Expression")),
+      new RuleReferenceNode("_"),
+      new LiteralMatcherNode(")", false)
+    ]),
+    new RuleReferenceNode("Integer")
+  ])
+)
+const rule_term = new RuleNode(
+  "Term",
+  new ActionExpressionNode(
+    new SequenceExpressionNode([
+      new LabeledExpressionNode(false, "head", new RuleReferenceNode("Factor")),
+      new LabeledExpressionNode(
+        false,
+        "tail",
+        new SuffixExpressionNode(
+          SuffixedOperatorEnum.ZERO_OR_MORE,
+          new SequenceExpressionNode([
+            new RuleReferenceNode("_"),
+            new LabeledExpressionNode(
+              true,
+              "",
+              new ChoiceExpressionNode([
+                new LiteralMatcherNode("*", false),
+                new LiteralMatcherNode("/", false)
+              ])
+            ),
+            new RuleReferenceNode("_"),
+            new LabeledExpressionNode(true, "", new RuleReferenceNode("Factor"))
+          ])
+        )
+      )
+    ]),
+    String.raw`
+        return tail.reduce(function(result, element) {
+          if (element[0] === "*") return result * element[1];
+          if (element[0] === "/") return result / element[1];
+        }, head);
+      `
+  )
+)
+
+const rule_expression = new RuleNode(
+  "Expression",
+  new ActionExpressionNode(
+    new SequenceExpressionNode([
+      new LabeledExpressionNode(false, "head", new RuleReferenceNode("Term")),
+      new LabeledExpressionNode(
+        false,
+        "tail",
+        new SuffixExpressionNode(
+          SuffixedOperatorEnum.ZERO_OR_MORE,
+          new SequenceExpressionNode([
+            new RuleReferenceNode("_"),
+            new LabeledExpressionNode(
+              true,
+              "",
+              new ChoiceExpressionNode([
+                new LiteralMatcherNode("+", false),
+                new LiteralMatcherNode("-", false)
+              ])
+            ),
+            new RuleReferenceNode("_"),
+            new LabeledExpressionNode(true, "", new RuleReferenceNode("Term"))
+          ])
+        )
+      )
+    ]),
+    String.raw`
+        return tail.reduce(function(result, element) {
+          if (element[0] === "+") return result + element[1];
+          if (element[0] === "-") return result - element[1];
+        }, head);
+      `
+  )
+)
+
 describe("rule", () => {
   const pr = new ParserResolver()
   pr.add("Expression", Expression)
   pr.add("Code", Code)
 
-  describe("whitespace", () => {
+  test("whitespace", () => {
     const pc = new ParseContext(new ParserCache(), pr)
-    const rule_whitespace = new RuleNode(
-      "_",
-      new ZeroOrMoreExpressionNode(
-        new CharacterClassMatcherExpressionNode(false, false, [
-          new CharactorNode(" "),
-          new CharactorNode("\t"),
-          new CharactorNode("\n"),
-          new CharactorNode("\r")
-        ])
-      ),
-      "whitespace"
-    )
+    const input = String.raw`_ "whitespace"  = [ \t\n\r]*`
+    expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_whitespace)
+  })
 
-    const input =
-      ' Integer "integer" = _ [0-9]+ { return parseInt(text(), 10); }    '
-
-    expect(Rule.parse(pc, input)!).toStrictEqual(rule_whitespace)
-    // expect(Grammar.parse(pc, "hogea")!.length).toBe("hoge".length)
-    // expect(Grammar.parse(pc, "fuga")).toBe(null)
+  test("integar", () => {
+    const pc = new ParseContext(new ParserCache(), pr)
+    const input = String.raw`Integer "integer"
+    = _ [0-9]+ { return parseInt(text(), 10); }`
+    expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_integer)
+  })
+  test("factor", () => {
+    const pc = new ParseContext(new ParserCache(), pr)
+    const input = String.raw`Factor
+    = "(" _ @Expression _ ")"
+    / Integer`
+    expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_factor)
+  })
+  test("term", () => {
+    const pc = new ParseContext(new ParserCache(), pr)
+    const input = String.raw`Term
+    = head:Factor tail:(_ @("*" / "/") _ @Factor)* {
+        return tail.reduce(function(result, element) {
+          if (element[0] === "*") return result * element[1];
+          if (element[0] === "/") return result / element[1];
+        }, head);
+      }`
+    expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_term)
+  })
+  test("expression", () => {
+    const pc = new ParseContext(new ParserCache(), pr)
+    const input = String.raw`Expression
+    = head:Term tail:(_ @("+" / "-") _ @Term)* {
+        return tail.reduce(function(result, element) {
+          if (element[0] === "+") return result + element[1];
+          if (element[0] === "-") return result - element[1];
+        }, head);
+      }`
+    expect(Rule.parse(pc, input)!.value).toStrictEqual(rule_expression)
   })
 })
 

@@ -71,12 +71,12 @@ export const SingleEscapeCharacter = or(
   literal("'"),
   literal('"'),
   backslash,
-  literal("b"),
-  literal("f"),
-  literal("n"),
-  literal("r"),
-  literal("t"),
-  literal("v")
+  literal("b").mapTo("\b"),
+  literal("f").mapTo("\f"),
+  literal("n").mapTo("\n"),
+  literal("r").mapTo("\r"),
+  literal("t").mapTo("\t"),
+  literal("v").mapTo("\v")
 )
 
 export const DecimalDigit = between("0", "9")

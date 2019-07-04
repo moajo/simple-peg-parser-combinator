@@ -16,6 +16,6 @@ export const Code = repeat0(
       }
     )
   )
-).map(a => a.join("\n"))
+).map(a => a.join(""))
 
 export const CodeBlock = sequence(kakko_m, Code, kokka_m).map(pickCenter)
