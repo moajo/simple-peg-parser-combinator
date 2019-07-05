@@ -106,5 +106,5 @@ export class RuleNode {
 }
 
 export class GrammerNode {
-  constructor(public rules: RuleNode[]) {}
+  constructor(public rules: RuleNode[], public initCode?: string) {}
 }

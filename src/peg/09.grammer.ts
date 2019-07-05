@@ -120,6 +120,6 @@ export const Grammar = sequence(
   if (init === null) {
     return new GrammerNode(rules)
   } else {
-    throw new Error("wip")
+    return new GrammerNode(rules, init)
   }
 })
