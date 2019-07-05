@@ -41,6 +41,10 @@ export class ParserCache {
     return cache.result
   }
 
+  clear() {
+    this._memory = {}
+  }
+
   cacheProxy<T>(
     text: string,
     parser: Parser<T>,

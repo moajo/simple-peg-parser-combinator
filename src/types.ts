@@ -43,3 +43,12 @@ export class Parser<T> {
     })
   }
 }
+
+export class ClosedParser<T> {
+  constructor(private parser: Parser<T>, private context: ParseContext) {}
+
+  parse(s: string): ParseResult<T> | null {
+    this.context.cache.clear()
+    return this.parser.parse(this.context, s)
+  }
+}
