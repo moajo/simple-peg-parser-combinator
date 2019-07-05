@@ -20,6 +20,11 @@ describe("compiler", () => {
     pr.add("Code", Code)
     const ast = Grammar.parse(pc, arithmetics_src)!.value
     const res = compile(ast)
-    console.log(res)
+    expect(res.parse("1")!.value).toBe(1)
+    expect(res.parse("1*1+4")!.value).toBe(1 * 1 + 4)
+    expect(res.parse("3*4/5*(2+4)+5*(3+7)")!.value).toBe(
+      ((3 * 4) / 5) * (2 + 4) + 5 * (3 + 7)
+    )
+    expect(res.parse("3*4/5*6*(2+4")!.value).toBe(((3 * 4) / 5) * 6)
   })
 })

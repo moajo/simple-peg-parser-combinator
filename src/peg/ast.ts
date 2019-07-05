@@ -64,7 +64,7 @@ export const makeSemanticPredicateNode = (operator: string, code: string) =>
 export type CharactorRangeNode = {
   type: "CharactorRange"
   charStart: string
-  charEnd: String
+  charEnd: string
 }
 export const makeCharactorRangeNode = (charStart: string, charEnd: String) =>
   ({
@@ -73,7 +73,7 @@ export const makeCharactorRangeNode = (charStart: string, charEnd: String) =>
     charEnd
   } as CharactorRangeNode)
 
-type CharacterPart = CharactorNode | CharactorRangeNode
+export type CharacterPart = CharactorNode | CharactorRangeNode
 
 export type CharacterClassMatcherExpressionNode = {
   type: "CharacterClassMatcherExpression"
