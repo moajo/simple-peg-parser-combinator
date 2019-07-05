@@ -184,6 +184,7 @@ export type ExpressionNode =
   | ChoiceExpressionNode
   | RuleReferenceNode
   | LiteralMatcherNode
+  | AnyMatcherNode
 
 export type RuleNode = {
   type: "Rule"
