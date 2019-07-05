@@ -29,4 +29,38 @@ export class Parser<T> {
         : null
     })
   }
+
+  mapTo<U>(value: U): Parser<U> {
+    return this.map(_ => value)
+  }
+
+  debug(message: string): Parser<T> {
+    return new Parser((c, s) => {
+      console.log("@debug: " + message)
+      const res = this.parser(c, s)
+      console.log(
+        `@debug ${res ? "ok" : "ng"}: ` +
+          message +
+          (res ? JSON.stringify(res.value) : "")
+      )
+      return res
+    })
+  }
+  moredebug(message: string): Parser<T> {
+    return new Parser((c, s) => {
+      console.log("@debug: " + message)
+      const res = this.parser(c, s)
+      console.log(`@debug ${res ? "ok" : "ng"}: ` + message)
+      return res
+    })
+  }
+}
+
+export class ClosedParser<T> {
+  constructor(private parser: Parser<T>, private context: ParseContext) {}
+
+  parse(s: string): ParseResult<T> | null {
+    this.context.cache.clear()
+    return this.parser.parse(this.context, s)
+  }
 }

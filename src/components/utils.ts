@@ -8,7 +8,7 @@ import { Parser } from "../types"
  * @param charactors
  */
 export const anyCharactorOf = (charactors: string) =>
-  or(...Array.from(charactors).map(literal))
+  or(...Array.from(charactors).map(s => literal(s)))
 
 export const whitespace = repeat0(anyCharactorOf(" \t\n\r")).map(it =>
   it.join("")
@@ -33,11 +33,20 @@ export const EOF = new Parser((_, s) => {
  * @param startChar
  * @param endChar
  */
-export const between = (startChar: string, endChar: string) => {
-  const betweenChars: string[] = []
+export const between = (
+  startChar: string,
+  endChar: string,
+  ignoreCase?: boolean
+) => {
+  const start = startChar.codePointAt(0)!
   const end = endChar.codePointAt(0)!
-  for (let i = startChar.codePointAt(0)!; i <= end; ++i) {
-    betweenChars.push(String.fromCodePoint(i))
-  }
-  return anyCharactorOf(betweenChars.join(""))
+  return new Parser((_, s) => {
+    if (s.length >= 1) {
+      const codePoint = (ignoreCase ? s[0].toLowerCase() : s).codePointAt(0)!
+      if (start <= codePoint && codePoint <= end) {
+        return { length: 1, value: s[0] }
+      }
+    }
+    return null
+  })
 }

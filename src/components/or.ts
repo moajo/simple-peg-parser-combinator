@@ -11,7 +11,29 @@ export function or<T1, T2, T3>(
   p2: ParserIdentifier<T2>,
   p3: ParserIdentifier<T3>
 ): Parser<T1 | T2 | T3>
+export function or<T1, T2, T3, T4>(
+  p1: ParserIdentifier<T1>,
+  p2: ParserIdentifier<T2>,
+  p3: ParserIdentifier<T3>,
+  p4: ParserIdentifier<T4>
+): Parser<T1 | T2 | T3 | T4>
+export function or<T1, T2, T3, T4, T5>(
+  p1: ParserIdentifier<T1>,
+  p2: ParserIdentifier<T2>,
+  p3: ParserIdentifier<T3>,
+  p4: ParserIdentifier<T4>,
+  p5: ParserIdentifier<T5>
+): Parser<T1 | T2 | T3 | T4 | T5>
+export function or<T1, T2, T3, T4, T5, T6>(
+  p1: ParserIdentifier<T1>,
+  p2: ParserIdentifier<T2>,
+  p3: ParserIdentifier<T3>,
+  p4: ParserIdentifier<T4>,
+  p5: ParserIdentifier<T5>,
+  p6: ParserIdentifier<T6>
+): Parser<T1 | T2 | T3 | T4 | T5 | T6>
 export function or<T>(...parsers: ParserIdentifier<T>[]): Parser<T>
+export function or(...parsers: ParserIdentifier<any>[]): Parser<any>
 
 export function or(...parsers: ParserIdentifier<any>[]) {
   return new Parser((c, s: string) => {

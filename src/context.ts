@@ -1,15 +1,18 @@
 import { Parser, ParseResult, ParserIdentifier } from "./types"
 
 export default class ParserResolver {
-  private mem: { [key: string]: Parser<any> } = {}
-  add<T>(name: string, parser: Parser<T>): ParserIdentifier<T> {
+  private mem: { [key: string]: ParserIdentifier<any> } = {}
+  add<T>(name: string, parser: ParserIdentifier<T>): ParserIdentifier<T> {
     this.mem[name] = parser
     return name
   }
-  get(name: string) {
+  get(name: string): Parser<any> {
     const result = this.mem[name]
     if (!result) {
       throw new Error(`parser ${name} is not found in this context`)
+    }
+    if (typeof result === "string") {
+      return this.get(result)
     }
     return result
   }
@@ -39,6 +42,10 @@ export class ParserCache {
       return null
     }
     return cache.result
+  }
+
+  clear() {
+    this._memory = {}
   }
 
   cacheProxy<T>(
