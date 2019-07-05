@@ -39,7 +39,9 @@ export class Parser<T> {
       console.log("@debug: " + message)
       const res = this.parser(c, s)
       console.log(
-        `@debug ${res ? "ok" : "ng"}: ` + message + (res ? res.value : "")
+        `@debug ${res ? "ok" : "ng"}: ` +
+          message +
+          (res ? JSON.stringify(res.value) : "")
       )
       return res
     })
