@@ -20,18 +20,17 @@ const ref = <T>(id: string) =>
   })
 
 type PegParseResult = {
-  atmark: boolean
-  label: string
+  atmark?: true
+  label?: string
   matchString: string
   value: any
 }
 
-//   const toPegParseResult = (result:any)=>({
-//     atmark: false,
-//     label: "",
-//     matchString: string,
-//     value: result
-//   })
+const toPegParseResult = (result: any) =>
+  ({
+    matchString: result,
+    value: result
+  } as PegParseResult)
 
 const _compileCharacterPart: (
   c: CharacterPart,
@@ -39,218 +38,126 @@ const _compileCharacterPart: (
 ) => Parser<PegParseResult> = (c: CharacterPart, ignoreCase: boolean) => {
   switch (c.type) {
     case "Charactor":
-      return literal(c.char, ignoreCase).map(res => ({
-        atmark: false,
-        label: "",
-        matchString: res,
-        value: res
-      }))
+      return literal(c.char, ignoreCase).map(toPegParseResult)
     case "CharactorRange":
-      return between(c.charStart, c.charEnd, ignoreCase).map(res => ({
-        atmark: false,
-        label: "",
-        matchString: res,
-        value: res
-      }))
+      return between(c.charStart, c.charEnd, ignoreCase).map(toPegParseResult)
   }
-  throw new Error("not")
 }
 
 const _compileExpression: (
   expressionNode: ExpressionNode
-) => Parser<PegParseResult> = (expressionNode: ExpressionNode) => {
-  switch (expressionNode.type) {
+) => Parser<PegParseResult> = (exp: ExpressionNode) => {
+  switch (exp.type) {
     case "RuleReference":
-      return ref<PegParseResult>(expressionNode.ruleName).debug(
-        "ref:" + expressionNode.ruleName
-      )
+      return ref<PegParseResult>(exp.ruleName)
     case "SequenceExpression":
-      return sequence(...expressionNode.children.map(_compileExpression))
-        .map(res => {
-          const atmarks = res.filter(a => a.atmark)
-          if (atmarks.length !== 0) {
-            res = atmarks
-            return {
-              atmark: false,
-              label: "",
-              matchString: res.map(a => a.matchString).reduce((p, c) => p + c),
-              value: res.map(a => a.value)
-            }
+      return sequence(...exp.children.map(_compileExpression)).map(res => {
+        // @が使われていたら、付いてるやつだけ返す
+        const atmarks = res.filter(a => a.atmark)
+        if (atmarks.length !== 0) {
+          return {
+            label: "",
+            matchString: atmarks.reduce((p, c) => p + c.matchString, ""),
+            value: atmarks.map(a => a.value)
           }
-          const labeled = res.filter(a => a.label !== "")
-          if (labeled.length !== 0) {
-            res = labeled
-            console.log("@@@@@@@@@@@@@labeledlisrt", labeled)
-            let aa: { [k: string]: any } = {}
-            labeled.forEach(a => {
-              aa[a.label] = a.value
-            })
+        }
 
-            return {
-              atmark: false,
-              label: "",
-              matchString: res.map(a => a.matchString).reduce((p, c) => p + c),
-              value: aa
-            }
-          }
+        // ラベルが使われていたら、objectに変換する
+        const labeled = res.filter(a => !!a.label)
+        if (labeled.length !== 0) {
+          let values: { [k: string]: any } = {}
+          labeled.forEach(({ label, value }) => {
+            values[label!] = value
+          })
+
           return {
-            atmark: false,
             label: "",
-            matchString: res.map(a => a.matchString).reduce((p, c) => p + c),
-            value: res.map(a => a.value)
+            matchString: labeled.reduce((p, c) => p + c.matchString, ""),
+            value: values
           }
-        })
-        .debug("seq")
+        }
+        return {
+          label: "",
+          matchString: res.reduce((p, c) => p + c.matchString, ""),
+          value: res.map(a => a.value)
+        }
+      })
     case "ChoiceExpression":
-      return or(...expressionNode.children.map(_compileExpression)).debug(
-        "choice"
-      )
+      return or(...exp.children.map(_compileExpression))
     case "ActionExpression":
-      return _compileExpression(expressionNode.child)
-        .map(result => {
-          console.log("action ok!:", JSON.stringify(result))
-          console.log("action ok!:", "@@@" + expressionNode.actionCode + "@@@")
-          const argumentlist: [string, any][] = [
-            ["text", () => result.matchString]
-          ]
-          if (Array.isArray(result.value)) {
-          } else {
-            const labeled = result.value as { [k: string]: any }
-            console.log("action ok-labels:", JSON.stringify(labeled))
-            Object.keys(labeled).forEach(key => {
-              argumentlist.push([key, labeled[key]])
-            })
-          }
-          const argkeys = argumentlist.map(a => a[0])
-          const argvalues = argumentlist.map(a => a[1])
-          console.log("action ok-keys:", argkeys)
-          const f = Function(...argkeys, expressionNode.actionCode)
-          const v = f(...argvalues)
-          console.log("action ffff!:", "@@@" + v + "@@@")
-          return {
-            atmark: false,
-            label: "",
-            matchString: result.matchString,
-            value: v
-          }
-        })
-        .debug("action")
+      return _compileExpression(exp.child).map(result => {
+        const argumentlist: [string, any][] = [
+          ["text", () => result.matchString]
+        ]
+        if (!Array.isArray(result.value)) {
+          Object.keys(result.value).forEach(key => {
+            argumentlist.push([key, result.value[key]])
+          })
+        }
+        const argkeys = argumentlist.map(([key, _]) => key)
+        const argvalues = argumentlist.map(([_, value]) => value)
+        const action = Function(...argkeys, exp.actionCode)
+        const v = action(...argvalues)
+        return {
+          matchString: result.matchString,
+          value: v
+        }
+      })
     case "CharacterClassMatcherExpression":
-      const rr = expressionNode.targets.map(a =>
-        _compileCharacterPart(a, expressionNode.ignoreCase)
+      const children = or(
+        ...exp.targets.map(a => _compileCharacterPart(a, exp.ignoreCase))
       )
-      const rrr = or(...rr)
-      return expressionNode.inverted
-        ? notPredicate(rrr)
-            .map(
-              _ =>
-                ({
-                  atmark: false,
-                  label: "",
-                  matchString: "",
-                  value: ""
-                } as PegParseResult)
-            )
-            .debug("inverted []")
-        : rrr.debug("[]")
+      return exp.inverted
+        ? notPredicate(children).mapTo(toPegParseResult(""))
+        : children
     case "LabeledExpression":
-      const exp = _compileExpression(expressionNode.expression)
-      if (expressionNode.atmark) {
-        return exp
-          .map(result => {
-            return {
-              atmark: true,
-              label: "",
-              matchString: result.matchString,
-              value: result.value
-            }
-          })
-          .debug("atmarkkkkkkkk")
-      } else {
-        return exp
-          .map(result => {
-            return {
-              atmark: false,
-              label: expressionNode.label,
-              matchString: result.matchString,
-              value: result.value
-            }
-          })
-          .debug("labellllll:" + expressionNode.label)
-      }
+      const exp5 = _compileExpression(exp.expression)
+      return exp.atmark
+        ? exp5.map(result => ({
+            atmark: true,
+            matchString: result.matchString,
+            value: result.value
+          }))
+        : exp5.map(result => ({
+            label: exp.label,
+            matchString: result.matchString,
+            value: result.value
+          }))
+
     case "LiteralMatcher":
-      return literal(expressionNode.str, expressionNode.ignoreCase).map(
-        res =>
-          ({
-            atmark: false,
-            label: "",
-            matchString: res,
-            value: res
-          } as PegParseResult)
-      )
+      return literal(exp.str, exp.ignoreCase).map(res => toPegParseResult(res))
     case "PrefixExpression":
-      const exp2 = _compileExpression(expressionNode.expression).debug("pre")
-      switch (expressionNode.prefixOperator) {
+      const exp2 = _compileExpression(exp.expression)
+      switch (exp.prefixOperator) {
         case PrefixedOperatorEnum.TEXT:
-          return exp2.map(
-            res =>
-              ({
-                ...res,
-                value: res.matchString
-              } as PegParseResult)
-          )
-          break
+          return exp2.map(res => ({
+            ...res,
+            value: res.matchString
+          }))
         case PrefixedOperatorEnum.SIMPLE_AND:
           return exp2
         case PrefixedOperatorEnum.SIMPLE_NOT:
-          return notPredicate(exp2).map(
-            _ =>
-              ({
-                atmark: false,
-                label: "",
-                matchString: "",
-                value: ""
-              } as PegParseResult)
-          )
+          return notPredicate(exp2).mapTo(toPegParseResult(""))
       }
       throw new Error("aaaaa")
     case "SuffixExpression":
-      console.log("@@@@@@@@@@@@@", expressionNode.expression.type)
-      const exp3 = _compileExpression(expressionNode.expression).debug("suff")
-      switch (expressionNode.suffixOperator) {
+      const exp3 = _compileExpression(exp.expression)
+      switch (exp.suffixOperator) {
         case SuffixedOperatorEnum.OPTIONAL:
-          return zeroOrOne(exp3).map(res => {
-            if (res) {
-              return res
-            }
+          return zeroOrOne(exp3).map(res => (res ? res : toPegParseResult("")))
+        case SuffixedOperatorEnum.ZERO_OR_MORE:
+          return repeat0(exp3).map(res => {
             return {
-              atmark: false,
-              label: "",
-              matchString: "",
-              value: ""
+              matchString: res.reduce((p, c) => p + c.matchString, ""),
+              value: res.map(a => a.value)
             }
           })
-        case SuffixedOperatorEnum.ZERO_OR_MORE:
-          return repeat0(exp3)
-            .map(res => {
-              return {
-                atmark: false,
-                label: "",
-                matchString: res
-                  .map(a => a.matchString)
-                  .reduce((p, c) => p + c, ""),
-                value: res.map(a => a.value)
-              } as PegParseResult
-            })
-            .debug("*")
         case SuffixedOperatorEnum.ONE_OR_MORE:
           return repeat1(exp3).map(res => {
             return {
-              atmark: false,
-              label: "",
-              matchString: res.map(a => a.matchString).reduce((p, c) => p + c),
+              matchString: res.reduce((p, c) => p + c.matchString, ""),
               value: res.map(a => a.value)
-            } as PegParseResult
+            }
           })
       }
       throw new Error("aaaaa")
@@ -261,23 +168,19 @@ export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
   const { initCode, rules } = ast
 
   const resolver = new ParserResolver()
-  const compiledRules = rules.map(ruleNode => {
-    // TODO: use a.displayName
-    const compiledRule = _compileExpression(ruleNode.expression)
-    return resolver.add(ruleNode.name, compiledRule)
-  })
+  // TODO: use a.displayName
+  const compiledRules = rules.map(ruleNode =>
+    resolver.add(ruleNode.name, _compileExpression(ruleNode.expression))
+  )
 
   const firstRuleId = compiledRules[0]
 
-  const context = new ParseContext(new ParserCache(), resolver)
   const parser = new Parser((c, s) => {
     if (initCode) {
       eval(initCode)
     }
     const firstRule = resolveParser(firstRuleId, c.resolver)
     return firstRule.parse(c, s)
-  }).map(result => {
-    return result.value
-  })
-  return new ClosedParser(parser, context)
+  }).map(result => result.value)
+  return new ClosedParser(parser, new ParseContext(new ParserCache(), resolver))
 }
