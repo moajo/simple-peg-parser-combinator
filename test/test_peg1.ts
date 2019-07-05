@@ -3,20 +3,20 @@ import { Grammar, Expression, Rule } from "../src/peg/09.grammer"
 import * as fs from "fs"
 import { StringLiteral, LiteralMatcher } from "../src/peg/05.string"
 import {
-  LiteralMatcherNode,
-  AnyMatcherNode,
-  RuleReferenceNode,
-  GrammerNode,
-  RuleNode,
-  CharacterClassMatcherExpressionNode,
-  CharactorNode,
-  SuffixExpressionNode,
   SuffixedOperatorEnum,
-  ActionExpressionNode,
-  SequenceExpressionNode,
-  CharactorRangeNode,
-  ChoiceExpressionNode,
-  LabeledExpressionNode
+  makeLiteralMatcherNode,
+  makeAnyMatcherNode,
+  makeRuleNode,
+  makeActionExpressionNode,
+  makeSuffixExpressionNode,
+  makeCharactorNode,
+  makeSequenceExpressionNode,
+  makeRuleReferenceNode,
+  makeCharacterClassMatcherExpressionNode,
+  makeCharactorRangeNode,
+  makeChoiceExpressionNode,
+  makeLabeledExpressionNode,
+  makeGrammerNode
 } from "../src/peg/ast"
 import {
   PrimaryExpression,
@@ -35,10 +35,10 @@ test("string literal", () => {
   expect(StringLiteral.parse(pc, '"hogehoge"')!.value).toBe("hogehoge")
   expect(StringLiteral.parse(pc, "'hogehoge'")!.value).toBe("hogehoge")
   expect(LiteralMatcher.parse(pc, "'hogehoge'")!.value).toStrictEqual(
-    new LiteralMatcherNode("hogehoge", false)
+    makeLiteralMatcherNode("hogehoge", false)
   )
   expect(LiteralMatcher.parse(pc, "'hogehoge'i")!.value).toStrictEqual(
-    new LiteralMatcherNode("hogehoge", true)
+    makeLiteralMatcherNode("hogehoge", true)
   )
 })
 
@@ -54,7 +54,7 @@ describe("matchers", () => {
     test("AnyMatcher", () => {
       const pc = new ParseContext(new ParserCache(), new ParserResolver())
       expect(AnyMatcher.parse(pc, ".")!.value).toStrictEqual(
-        new AnyMatcherNode()
+        makeAnyMatcherNode()
       )
     })
   })
@@ -63,7 +63,7 @@ describe("matchers", () => {
     test("RuleReferenceExpression", () => {
       const pc = new ParseContext(new ParserCache(), new ParserResolver())
       expect(RuleReferenceExpression.parse(pc, "hoge")!.value).toStrictEqual(
-        new RuleReferenceNode("hoge")
+        makeRuleReferenceNode("hoge")
       )
     })
   })
@@ -87,28 +87,28 @@ describe("PrimaryExpression", () => {
   })
 })
 
-const rule_whitespace = new RuleNode(
+const rule_whitespace = makeRuleNode(
   "_",
-  new SuffixExpressionNode(
+  makeSuffixExpressionNode(
     SuffixedOperatorEnum.ZERO_OR_MORE,
-    new CharacterClassMatcherExpressionNode(false, false, [
-      new CharactorNode(" "),
-      new CharactorNode("\t"),
-      new CharactorNode("\n"),
-      new CharactorNode("\r")
+    makeCharacterClassMatcherExpressionNode(false, false, [
+      makeCharactorNode(" "),
+      makeCharactorNode("\t"),
+      makeCharactorNode("\n"),
+      makeCharactorNode("\r")
     ])
   ),
   "whitespace"
 )
-const rule_integer = new RuleNode(
+const rule_integer = makeRuleNode(
   "Integer",
-  new ActionExpressionNode(
-    new SequenceExpressionNode([
-      new RuleReferenceNode("_"),
-      new SuffixExpressionNode(
+  makeActionExpressionNode(
+    makeSequenceExpressionNode([
+      makeRuleReferenceNode("_"),
+      makeSuffixExpressionNode(
         SuffixedOperatorEnum.ONE_OR_MORE,
-        new CharacterClassMatcherExpressionNode(false, false, [
-          new CharactorRangeNode("0", "9")
+        makeCharacterClassMatcherExpressionNode(false, false, [
+          makeCharactorRangeNode("0", "9")
         ])
       )
     ]),
@@ -116,41 +116,41 @@ const rule_integer = new RuleNode(
   ),
   "integer"
 )
-const rule_factor = new RuleNode(
+const rule_factor = makeRuleNode(
   "Factor",
-  new ChoiceExpressionNode([
-    new SequenceExpressionNode([
-      new LiteralMatcherNode("(", false),
-      new RuleReferenceNode("_"),
-      new LabeledExpressionNode(true, "", new RuleReferenceNode("Expression")),
-      new RuleReferenceNode("_"),
-      new LiteralMatcherNode(")", false)
+  makeChoiceExpressionNode([
+    makeSequenceExpressionNode([
+      makeLiteralMatcherNode("(", false),
+      makeRuleReferenceNode("_"),
+      makeLabeledExpressionNode(true, "", makeRuleReferenceNode("Expression")),
+      makeRuleReferenceNode("_"),
+      makeLiteralMatcherNode(")", false)
     ]),
-    new RuleReferenceNode("Integer")
+    makeRuleReferenceNode("Integer")
   ])
 )
-const rule_term = new RuleNode(
+const rule_term = makeRuleNode(
   "Term",
-  new ActionExpressionNode(
-    new SequenceExpressionNode([
-      new LabeledExpressionNode(false, "head", new RuleReferenceNode("Factor")),
-      new LabeledExpressionNode(
+  makeActionExpressionNode(
+    makeSequenceExpressionNode([
+      makeLabeledExpressionNode(false, "head", makeRuleReferenceNode("Factor")),
+      makeLabeledExpressionNode(
         false,
         "tail",
-        new SuffixExpressionNode(
+        makeSuffixExpressionNode(
           SuffixedOperatorEnum.ZERO_OR_MORE,
-          new SequenceExpressionNode([
-            new RuleReferenceNode("_"),
-            new LabeledExpressionNode(
+          makeSequenceExpressionNode([
+            makeRuleReferenceNode("_"),
+            makeLabeledExpressionNode(
               true,
               "",
-              new ChoiceExpressionNode([
-                new LiteralMatcherNode("*", false),
-                new LiteralMatcherNode("/", false)
+              makeChoiceExpressionNode([
+                makeLiteralMatcherNode("*", false),
+                makeLiteralMatcherNode("/", false)
               ])
             ),
-            new RuleReferenceNode("_"),
-            new LabeledExpressionNode(true, "", new RuleReferenceNode("Factor"))
+            makeRuleReferenceNode("_"),
+            makeLabeledExpressionNode(true, "", makeRuleReferenceNode("Factor"))
           ])
         )
       )
@@ -164,28 +164,28 @@ const rule_term = new RuleNode(
   )
 )
 
-const rule_expression = new RuleNode(
+const rule_expression = makeRuleNode(
   "Expression",
-  new ActionExpressionNode(
-    new SequenceExpressionNode([
-      new LabeledExpressionNode(false, "head", new RuleReferenceNode("Term")),
-      new LabeledExpressionNode(
+  makeActionExpressionNode(
+    makeSequenceExpressionNode([
+      makeLabeledExpressionNode(false, "head", makeRuleReferenceNode("Term")),
+      makeLabeledExpressionNode(
         false,
         "tail",
-        new SuffixExpressionNode(
+        makeSuffixExpressionNode(
           SuffixedOperatorEnum.ZERO_OR_MORE,
-          new SequenceExpressionNode([
-            new RuleReferenceNode("_"),
-            new LabeledExpressionNode(
+          makeSequenceExpressionNode([
+            makeRuleReferenceNode("_"),
+            makeLabeledExpressionNode(
               true,
               "",
-              new ChoiceExpressionNode([
-                new LiteralMatcherNode("+", false),
-                new LiteralMatcherNode("-", false)
+              makeChoiceExpressionNode([
+                makeLiteralMatcherNode("+", false),
+                makeLiteralMatcherNode("-", false)
               ])
             ),
-            new RuleReferenceNode("_"),
-            new LabeledExpressionNode(true, "", new RuleReferenceNode("Term"))
+            makeRuleReferenceNode("_"),
+            makeLabeledExpressionNode(true, "", makeRuleReferenceNode("Term"))
           ])
         )
       )
@@ -199,7 +199,7 @@ const rule_expression = new RuleNode(
   )
 )
 
-const rule_grammer = new GrammerNode([
+const rule_grammer = makeGrammerNode([
   rule_expression,
   rule_term,
   rule_factor,

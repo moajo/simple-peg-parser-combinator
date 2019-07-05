@@ -9,102 +9,216 @@ export enum PrefixedOperatorEnum {
   SIMPLE_NOT
 }
 
-export class Node {}
+export type LiteralMatcherNode = {
+  type: "LiteralMatcher"
+  str: string
+  ignoreCase: boolean
+}
+export const makeLiteralMatcherNode = (str: string, ignoreCase: boolean) =>
+  ({
+    type: "LiteralMatcher",
+    str,
+    ignoreCase
+  } as LiteralMatcherNode)
 
-export class LiteralMatcherNode {
-  constructor(public str: string, public ignoreCase: boolean) {}
+export type AnyMatcherNode = {
+  type: "AnyMatcher"
 }
-export class AnyMatcherNode {
-  constructor() {}
+export const makeAnyMatcherNode = () =>
+  ({
+    type: "AnyMatcher"
+  } as AnyMatcherNode)
+
+export type RuleReferenceNode = {
+  type: "RuleReference"
+  ruleName: string
 }
 
-export class RuleReferenceNode {
-  constructor(public ruleName: string) {}
-}
-export class ExpressionNode {
-  constructor() {}
-}
+export const makeRuleReferenceNode = (ruleName: string) =>
+  ({
+    type: "RuleReference",
+    ruleName
+  } as RuleReferenceNode)
 
-export class CharactorNode {
-  constructor(public char: string) {}
+export type CharactorNode = {
+  type: "Charactor"
+  char: string
 }
-export class SemanticPredicateNode {
-  constructor(public operator: string, public code: string) {}
+export const makeCharactorNode = (char: string) =>
+  ({
+    type: "Charactor",
+    char
+  } as CharactorNode)
+export type SemanticPredicateNode = {
+  type: "SemanticPredicate"
+  operator: string
+  code: string
 }
+export const makeSemanticPredicateNode = (operator: string, code: string) =>
+  ({
+    type: "SemanticPredicate",
+    operator,
+    code
+  } as SemanticPredicateNode)
 
-export class CharactorRangeNode {
-  constructor(public charStart: string, public charEnd: String) {}
+export type CharactorRangeNode = {
+  type: "CharactorRange"
+  charStart: string
+  charEnd: String
 }
+export const makeCharactorRangeNode = (charStart: string, charEnd: String) =>
+  ({
+    type: "CharactorRange",
+    charStart,
+    charEnd
+  } as CharactorRangeNode)
 
 type CharacterPart = CharactorNode | CharactorRangeNode
 
-export class CharacterClassMatcherExpressionNode extends ExpressionNode {
-  constructor(
-    public inverted: boolean,
-    public ignoreCase: boolean,
-    public targets: CharacterPart[]
-  ) {
-    super()
-  }
+export type CharacterClassMatcherExpressionNode = {
+  type: "CharacterClassMatcherExpression"
+  inverted: boolean
+  ignoreCase: boolean
+  targets: CharacterPart[]
 }
+export const makeCharacterClassMatcherExpressionNode = (
+  inverted: boolean,
+  ignoreCase: boolean,
+  targets: CharacterPart[]
+) =>
+  ({
+    type: "CharacterClassMatcherExpression",
+    inverted,
+    ignoreCase,
+    targets
+  } as CharacterClassMatcherExpressionNode)
 
-export class SuffixExpressionNode extends ExpressionNode {
-  constructor(
-    public suffixOperator: SuffixedOperatorEnum,
-    public expression: ExpressionNode
-  ) {
-    super()
-  }
+export type SuffixExpressionNode = {
+  type: "SuffixExpression"
+  suffixOperator: SuffixedOperatorEnum
+  expression: ExpressionNode
 }
-export class PrefixExpressionNode extends ExpressionNode {
-  constructor(
-    public prefixOperator: PrefixedOperatorEnum,
-    public expression: ExpressionNode
-  ) {
-    super()
-  }
+export const makeSuffixExpressionNode = (
+  suffixOperator: SuffixedOperatorEnum,
+  expression: ExpressionNode
+) =>
+  ({
+    type: "SuffixExpression",
+    suffixOperator,
+    expression
+  } as SuffixExpressionNode)
+export type PrefixExpressionNode = {
+  type: "PrefixExpression"
+  prefixOperator: PrefixedOperatorEnum
+  expression: ExpressionNode
 }
+export const makePrefixExpressionNode = (
+  prefixOperator: PrefixedOperatorEnum,
+  expression: ExpressionNode
+) =>
+  ({
+    type: "PrefixExpression",
+    prefixOperator,
+    expression
+  } as PrefixExpressionNode)
 
-export class LabeledExpressionNode extends ExpressionNode {
-  constructor(
-    public atmark: boolean,
-    public label: string,
-    public expression: ExpressionNode
-  ) {
-    super()
-  }
+export type LabeledExpressionNode = {
+  type: "LabeledExpression"
+  atmark: boolean
+  label: string
+  expression: ExpressionNode
 }
+export const makeLabeledExpressionNode = (
+  atmark: boolean,
+  label: string,
+  expression: ExpressionNode
+) =>
+  ({
+    type: "LabeledExpression",
+    atmark,
+    label,
+    expression
+  } as LabeledExpressionNode)
 
-export class SequenceExpressionNode extends ExpressionNode {
-  constructor(public children: ExpressionNode[]) {
-    super()
-  }
+export type SequenceExpressionNode = {
+  type: "SequenceExpression"
+  children: ExpressionNode[]
 }
-export class ActionExpressionNode extends ExpressionNode {
-  constructor(public child: ExpressionNode, public actionCode: string) {
-    super()
-  }
+export const makeSequenceExpressionNode = (children: ExpressionNode[]) =>
+  ({
+    type: "SequenceExpression",
+    children
+  } as SequenceExpressionNode)
+export type ActionExpressionNode = {
+  type: "ActionExpression"
+  child: ExpressionNode
+  actionCode: string
 }
+export const makeActionExpressionNode = (
+  child: ExpressionNode,
+  actionCode: string
+) =>
+  ({
+    type: "ActionExpression",
+    child,
+    actionCode
+  } as ActionExpressionNode)
 
-export class ZeroOrMoreExpressionNode extends ExpressionNode {
-  constructor(public child: ExpressionNode) {
-    super()
-  }
+export type ChoiceExpressionNode = {
+  type: "ChoiceExpression"
+  children: ExpressionNode[]
 }
-export class ChoiceExpressionNode extends ExpressionNode {
-  constructor(public children: ExpressionNode[]) {
-    super()
-  }
-}
+export const makeChoiceExpressionNode = (children: ExpressionNode[]) =>
+  ({
+    type: "ChoiceExpression",
+    children
+  } as ChoiceExpressionNode)
 
-export class RuleNode {
-  constructor(
-    public name: string,
-    public expression: ExpressionNode,
-    public displayName?: string
-  ) {}
-}
+export type ExpressionNode =
+  | CharacterClassMatcherExpressionNode
+  | SuffixExpressionNode
+  | PrefixExpressionNode
+  | LabeledExpressionNode
+  | SequenceExpressionNode
+  | ActionExpressionNode
+  | ChoiceExpressionNode
+  | RuleReferenceNode
+  | LiteralMatcherNode
 
-export class GrammerNode {
-  constructor(public rules: RuleNode[], public initCode?: string) {}
+export type RuleNode = {
+  type: "Rule"
+  name: string
+  expression: ExpressionNode
+  displayName?: string
 }
+export const makeRuleNode = (
+  name: string,
+  expression: ExpressionNode,
+  displayName?: string
+) =>
+  ({
+    type: "Rule",
+    name,
+    expression,
+    displayName
+  } as RuleNode)
+
+export type GrammerNode = {
+  type: "Grammer"
+  rules: RuleNode[]
+  initCode?: string
+}
+export const makeGrammerNode = (rules: RuleNode[], initCode?: string) =>
+  ({
+    type: "Grammer",
+    rules,
+    initCode
+  } as GrammerNode)
+
+export type Node =
+  | LiteralMatcherNode
+  | AnyMatcherNode
+  | RuleReferenceNode
+  | ExpressionNode
+  | RuleNode
+  | GrammerNode

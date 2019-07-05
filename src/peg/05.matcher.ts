@@ -18,10 +18,10 @@ import {
 } from "./01.literal"
 import { notPredicate } from "../components/predicate"
 import {
-  AnyMatcherNode,
-  CharacterClassMatcherExpressionNode,
-  CharactorNode,
-  CharactorRangeNode
+  makeAnyMatcherNode,
+  makeCharacterClassMatcherExpressionNode,
+  makeCharactorRangeNode,
+  makeCharactorNode
 } from "./ast"
 import { pickSecond } from "../utils"
 
@@ -32,13 +32,13 @@ export const ClassCharacter = or(
   ).map(pickSecond),
   sequence(backslash, EscapeSequence).map(pickSecond),
   LineContinuation
-).map(char => new CharactorNode(char))
+).map(char => makeCharactorNode(char))
 
 export const ClassCharacterRange = sequence(
   ClassCharacter,
   hyphen,
   ClassCharacter
-).map(([s, _, e]) => new CharactorRangeNode(s.char, e.char))
+).map(([s, _, e]) => makeCharactorRangeNode(s.char, e.char))
 
 export const CharacterPart = or(ClassCharacterRange, ClassCharacter)
 
@@ -50,7 +50,7 @@ export const CharacterClassMatcher = sequence(
   kokka_l,
   zeroOrOne(literal("i")).map(a => a != null)
 ).map(([_, inverted, parts, __, ignoreCase]) => {
-  return new CharacterClassMatcherExpressionNode(inverted, ignoreCase, parts)
+  return makeCharacterClassMatcherExpressionNode(inverted, ignoreCase, parts)
 })
 
 // -------------------
@@ -59,4 +59,4 @@ export const SemanticPredicateOperator = or(
   exclamation.map(_ => "semantic_not")
 )
 
-export const AnyMatcher = dot.map(_ => new AnyMatcherNode())
+export const AnyMatcher = dot.map(_ => makeAnyMatcherNode())

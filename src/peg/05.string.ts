@@ -17,7 +17,7 @@ import {
 } from "./01.literal"
 import { __, _ } from "./03.spaces"
 import { pickSecond, pickCenter } from "../utils"
-import { LiteralMatcherNode } from "./ast"
+import { makeLiteralMatcherNode } from "./ast"
 
 export const DoubleStringCharacter = or(
   sequence(
@@ -53,4 +53,4 @@ export const StringLiteral = or(
 export const LiteralMatcher = sequence(
   StringLiteral,
   zeroOrOne(literal("i")).map(v => v !== null)
-).map(([str, ignoreCase]) => new LiteralMatcherNode(str, ignoreCase))
+).map(([str, ignoreCase]) => makeLiteralMatcherNode(str, ignoreCase))

@@ -10,7 +10,11 @@ import {
   AnyMatcher
 } from "./05.matcher"
 import { pickFirst } from "../utils"
-import { RuleReferenceNode, SemanticPredicateNode, ExpressionNode } from "./ast"
+import {
+  ExpressionNode,
+  makeRuleReferenceNode,
+  makeSemanticPredicateNode
+} from "./ast"
 import { ParserIdentifier } from "../types"
 
 export const RuleReferenceExpression = sequence(
@@ -18,13 +22,13 @@ export const RuleReferenceExpression = sequence(
   notPredicate(sequence(__, zeroOrOne(sequence(StringLiteral, __)), equal))
 )
   .map(pickFirst)
-  .map(name => new RuleReferenceNode(name))
+  .map(name => makeRuleReferenceNode(name))
 
 export const SemanticPredicateExpression = sequence(
   SemanticPredicateOperator,
   __,
   CodeBlock
-).map(([a, _, c]) => new SemanticPredicateNode(a, c))
+).map(([a, _, c]) => makeSemanticPredicateNode(a, c))
 
 export const PrimaryExpression = or(
   LiteralMatcher,
