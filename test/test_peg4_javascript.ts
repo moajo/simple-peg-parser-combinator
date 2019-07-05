@@ -4,7 +4,7 @@ import * as fs from "fs"
 import { Code } from "../src/peg/01.1.codeblock"
 import { compile } from "../src/peg/compiler"
 
-const javascript_src = fs.readFileSync("./peg/javascript.pegjs", {
+const js_syntax_definition = fs.readFileSync("./peg/javascript.pegjs", {
   encoding: "utf8"
 })
 
@@ -18,10 +18,9 @@ describe("compiler", () => {
     const pc = new ParseContext(new ParserCache(), pr)
     pr.add("Expression", Expression)
     pr.add("Code", Code)
-    const ast = Grammar.parse(pc, javascript_src)!.value
-    // console.log(JSON.stringify(ast, null, 2))
-    const res = compile(ast)
-    expect(res.parse("1")!.value).toStrictEqual({
+    const ast = Grammar.parse(pc, js_syntax_definition)!.value
+    const js_parser = compile(ast)
+    expect(js_parser.parse("1")!.value).toStrictEqual({
       type: "Program",
       body: [
         {
@@ -33,8 +32,29 @@ describe("compiler", () => {
         }
       ]
     })
+    expect(js_parser.parse("1+1")!.value).toStrictEqual({
+      type: "Program",
+      body: [
+        {
+          type: "ExpressionStatement",
+          expression: {
+            type: "BinaryExpression",
+            operator: "+",
+            left: {
+              type: "Literal",
+              value: 1
+            },
+            right: {
+              type: "Literal",
+              value: 1
+            }
+          }
+        }
+      ]
+    })
+
     expect(
-      res.parse('var img_front = document.createElement("img");')!.value
+      js_parser.parse('var img_front = document.createElement("img");')!.value
     ).toStrictEqual({
       type: "Program",
       body: [
