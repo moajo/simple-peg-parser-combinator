@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "exec": "ts-node src/bin.ts"
+    "exec": "ts-node src/bin.ts",
+    "build": "tsc"
   },
   "author": "moajo",
   "license": "ISC",

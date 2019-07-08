@@ -14,7 +14,8 @@
     "noUnusedParameters": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "outDir": "dst"
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }
