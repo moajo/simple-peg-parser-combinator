@@ -38,9 +38,9 @@ const _compileCharacterPart: (
   ignoreCase: boolean
 ) => Parser<PegParseResult> = (c: CharacterPart, ignoreCase: boolean) => {
   switch (c.type) {
-    case "Charactor":
+    case "Character":
       return literal(c.char, ignoreCase).map(toPegParseResult)
-    case "CharactorRange":
+    case "CharacterRange":
       return between(c.charStart, c.charEnd, ignoreCase).map(toPegParseResult)
   }
 }
@@ -64,7 +64,8 @@ const _compileExpression: (
           return {
             label: "",
             matchString: atmarks.reduce((p, c) => p + c.matchString, ""),
-            value: atmarks.map(a => a.value)
+            value:
+              atmarks.length == 1 ? atmarks[0].value : atmarks.map(a => a.value)
           }
         }
 
@@ -92,8 +93,6 @@ const _compileExpression: (
       return or(...exp.children.map(a => _compileExpression(a, initCode)))
     case "ActionExpression":
       return _compileExpression(exp.child, initCode).map(result => {
-        // console.log("@p@p@@", JSON.stringify(result))
-
         const argumentlist: [string, any][] = [
           ["text", () => result.matchString]
         ]
@@ -105,21 +104,21 @@ const _compileExpression: (
         if (result.label) {
           argumentlist.push([result.label, result.value])
         } else {
-          if (!Array.isArray(result.value)) {
+          if (
+            !Array.isArray(result.value) &&
+            typeof result.value === "object"
+          ) {
             Object.keys(result.value).forEach(key => {
               argumentlist.push([key, result.value[key]])
             })
           }
         }
-        // console.log("@@@y@y@y@", argumentlist)
-        // console.log("@@@y@y@y2222@", result.value)
 
         const argkeys = argumentlist.map(([key, _]) => key)
         const argvalues = argumentlist.map(([_, value]) => value)
         const action = Function(...argkeys, initCode + "\n" + exp.actionCode)
-        // console.log("@@@@@@@@@@" + exp.actionCode)
-
         const v = action(...argvalues)
+
         return {
           matchString: result.matchString,
           value: v

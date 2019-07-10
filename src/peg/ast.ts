@@ -40,15 +40,15 @@ export const makeRuleReferenceNode = (ruleName: string) =>
     ruleName
   } as RuleReferenceNode)
 
-export type CharactorNode = {
-  type: "Charactor"
+export type CharacterNode = {
+  type: "Character"
   char: string
 }
-export const makeCharactorNode = (char: string) =>
+export const makeCharacterNode = (char: string) =>
   ({
-    type: "Charactor",
+    type: "Character",
     char
-  } as CharactorNode)
+  } as CharacterNode)
 export type SemanticPredicateNode = {
   type: "SemanticPredicate"
   operator: string
@@ -61,19 +61,19 @@ export const makeSemanticPredicateNode = (operator: string, code: string) =>
     code
   } as SemanticPredicateNode)
 
-export type CharactorRangeNode = {
-  type: "CharactorRange"
+export type CharacterRangeNode = {
+  type: "CharacterRange"
   charStart: string
   charEnd: string
 }
-export const makeCharactorRangeNode = (charStart: string, charEnd: String) =>
+export const makeCharacterRangeNode = (charStart: string, charEnd: String) =>
   ({
-    type: "CharactorRange",
+    type: "CharacterRange",
     charStart,
     charEnd
-  } as CharactorRangeNode)
+  } as CharacterRangeNode)
 
-export type CharacterPart = CharactorNode | CharactorRangeNode
+export type CharacterPart = CharacterNode | CharacterRangeNode
 
 export type CharacterClassMatcherExpressionNode = {
   type: "CharacterClassMatcherExpression"

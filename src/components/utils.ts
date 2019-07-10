@@ -3,24 +3,24 @@ import { Parser } from "../types"
 
 /**
  * match any single character that appears in the given string
- * @param charactors
+ * @param characters
  */
-export const anyCharactorOf = (charactors: string, ignoreCase?: boolean) =>
+export const anyCharacterOf = (characters: string, ignoreCase?: boolean) =>
   new Parser((_, s) => {
     if (ignoreCase) {
       s = s.toLowerCase()
-      charactors = charactors.toLowerCase()
+      characters = characters.toLowerCase()
     }
-    return charactors.includes(s[0])
+    return characters.includes(s[0])
       ? {
           length: 1,
           value: s[0]
         }
       : null
   })
-// or(...Array.from(charactors).map(s => literal(s)))
+// or(...Array.from(characters).map(s => literal(s)))
 
-export const whitespace = repeat0(anyCharactorOf(" \t\n\r")).map(it =>
+export const whitespace = repeat0(anyCharacterOf(" \t\n\r")).map(it =>
   it.join("")
 )
 

@@ -2,7 +2,7 @@ import { literal, or, repeat1 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 import { sequence } from "../src/components/sequence"
 import { zeroOrOne, repeat0 } from "../src/components/repeat"
-import { whitespace, anyCharactorOf } from "../src/components/utils"
+import { whitespace, anyCharacterOf } from "../src/components/utils"
 
 // see: https://github.com/pegjs/pegjs/blob/master/examples/json.pegjs
 
@@ -84,7 +84,7 @@ describe("json", () => {
 
   //7. string
   const quote = literal('"')
-  const char = anyCharactorOf("abcdefghijklmnopqrstuvwyz") //TODO: more detail
+  const char = anyCharacterOf("abcdefghijklmnopqrstuvwyz") //TODO: more detail
   const chars = repeat0(char)
   c.add("string", sequence(quote, chars, quote).map(vs => vs[1].join("")))
 

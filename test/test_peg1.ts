@@ -9,11 +9,11 @@ import {
   makeRuleNode,
   makeActionExpressionNode,
   makeSuffixExpressionNode,
-  makeCharactorNode,
+  makeCharacterNode,
   makeSequenceExpressionNode,
   makeRuleReferenceNode,
   makeCharacterClassMatcherExpressionNode,
-  makeCharactorRangeNode,
+  makeCharacterRangeNode,
   makeChoiceExpressionNode,
   makeLabeledExpressionNode,
   makeGrammerNode
@@ -92,10 +92,10 @@ const rule_whitespace = makeRuleNode(
   makeSuffixExpressionNode(
     SuffixedOperatorEnum.ZERO_OR_MORE,
     makeCharacterClassMatcherExpressionNode(false, false, [
-      makeCharactorNode(" "),
-      makeCharactorNode("\t"),
-      makeCharactorNode("\n"),
-      makeCharactorNode("\r")
+      makeCharacterNode(" "),
+      makeCharacterNode("\t"),
+      makeCharacterNode("\n"),
+      makeCharacterNode("\r")
     ])
   ),
   "whitespace"
@@ -108,7 +108,7 @@ const rule_integer = makeRuleNode(
       makeSuffixExpressionNode(
         SuffixedOperatorEnum.ONE_OR_MORE,
         makeCharacterClassMatcherExpressionNode(false, false, [
-          makeCharactorRangeNode("0", "9")
+          makeCharacterRangeNode("0", "9")
         ])
       )
     ]),

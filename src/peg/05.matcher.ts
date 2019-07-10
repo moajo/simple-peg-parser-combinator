@@ -20,8 +20,8 @@ import { notPredicate } from "../components/predicate"
 import {
   makeAnyMatcherNode,
   makeCharacterClassMatcherExpressionNode,
-  makeCharactorRangeNode,
-  makeCharactorNode
+  makeCharacterRangeNode,
+  makeCharacterNode
 } from "./ast"
 import { pickSecond } from "../utils"
 
@@ -32,13 +32,13 @@ export const ClassCharacter = or(
   ).map(pickSecond),
   sequence(backslash, EscapeSequence).map(pickSecond),
   LineContinuation
-).map(char => makeCharactorNode(char))
+).map(char => makeCharacterNode(char))
 
 export const ClassCharacterRange = sequence(
   ClassCharacter,
   hyphen,
   ClassCharacter
-).map(([s, _, e]) => makeCharactorRangeNode(s.char, e.char))
+).map(([s, _, e]) => makeCharacterRangeNode(s.char, e.char))
 
 export const CharacterPart = or(ClassCharacterRange, ClassCharacter)
 
