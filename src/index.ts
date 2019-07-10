@@ -6,8 +6,3 @@ export * from "./components/sequence"
 export * from "./components/repeat"
 export * from "./components/predicate"
 export * from "./components/regex"
-
-export default () => {
-  console.log("hello")
-  return 1
-}

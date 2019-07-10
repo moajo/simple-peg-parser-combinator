@@ -1,20 +1,35 @@
 import { ParseContext } from "./context"
 
+// TODO: utils.refに統合？
 export type ParserIdentifier<T> = string | Parser<T>
 
 export type ParseResult<T> = {
+  /**
+   * マッチした長さ
+   */
   length: number
+  /**
+   * マッチした値
+   */
   value: T
 }
 
+/**
+ * コンビネータ基底
+ * コンストラクタで受け取った本体の処理に対して、キャッシュを適用する(packrat)
+ * ついでにutilityを生やしてある
+ */
 export class Parser<T> {
   constructor(
+    /**
+     * コンビネータ本体
+     * コンテキストと現在の検査対象文字列を受け取り、マッチすればParseResult<T>を、そうでなければnullを返すことが期待される
+     */
     private parser: (c: ParseContext, s: string) => ParseResult<T> | null
   ) {}
+
   parse(c: ParseContext, s: string): ParseResult<T> | null {
-    return c.cache.cacheProxy(s, this, () => {
-      return this.parser(c, s)
-    })
+    return c.cache.cacheProxy(s, this, () => this.parser(c, s))
   }
 
   map<U>(mapper: (result: T) => U): Parser<U> {
@@ -46,16 +61,11 @@ export class Parser<T> {
       return res
     })
   }
-  moredebug(message: string): Parser<T> {
-    return new Parser((c, s) => {
-      console.log("@debug: " + message)
-      const res = this.parser(c, s)
-      console.log(`@debug ${res ? "ok" : "ng"}: ` + message)
-      return res
-    })
-  }
 }
 
+/**
+ * Parser bound to a fixed resolver.
+ */
 export class ClosedParser<T> {
   constructor(private parser: Parser<T>, private context: ParseContext) {}
 

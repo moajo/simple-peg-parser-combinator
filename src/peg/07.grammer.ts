@@ -50,16 +50,11 @@ export const SuffixedExpression = or(
     makeSuffixExpressionNode(c, a)
   ),
   PrimaryExpression
-).map(a => {
-  return a
-})
+)
 
-export const LabelIdentifier = sequence(Identifier, __, literal(":")).map(a => {
-  // if ( RESERVED_WORDS[ name ] !== true ) return name;
-
-  // error( `Label can't be a reserved word "${ name }".`, location() );
-  return a[0]
-})
+export const LabelIdentifier = sequence(Identifier, __, literal(":")).map(
+  a => a[0]
+)
 
 export const PrefixedExpression = or(
   sequence(PrefixedOperator, __, SuffixedExpression).map(([c, _, a]) =>
@@ -117,13 +112,9 @@ export const Grammar = sequence(
   __,
   zeroOrOne(sequence(Initializer, __).map(pickFirst)),
   repeat1(sequence(Rule, __).map(pickFirst))
-).map(([_, init, rules]) => {
-  if (init === null) {
-    return makeGrammerNode(rules)
-  } else {
-    return makeGrammerNode(rules, init)
-  }
-})
+).map(([_, init, rules]) =>
+  init === null ? makeGrammerNode(rules) : makeGrammerNode(rules, init)
+)
 const pr = new ParserResolver()
 const pc = new ParseContext(new ParserCache(), pr)
 pr.add("Expression", Expression)

@@ -11,14 +11,9 @@ import { resolveParser } from "../utils"
 import { or, sequence } from ".."
 import { literal } from "../components/literal"
 import { notPredicate } from "../components/predicate"
-import { between } from "../components/utils"
+import { between, ref } from "../components/utils"
 import { zeroOrOne, repeat0, repeat1 } from "../components/repeat"
 import { anyChar } from "../components/any"
-
-const ref = <T>(id: string) =>
-  new Parser<T>((c, s) => {
-    return resolveParser<T>(id, c.resolver).parse(c, s)
-  })
 
 type PegParseResult = {
   atmark?: true
@@ -27,11 +22,10 @@ type PegParseResult = {
   value: any
 }
 
-const toPegParseResult = (result: any) =>
-  ({
-    matchString: result,
-    value: result
-  } as PegParseResult)
+const toPegParseResult: (result: any) => PegParseResult = (result: any) => ({
+  matchString: result,
+  value: result
+})
 
 const _compileCharacterPart: (
   c: CharacterPart,
@@ -49,8 +43,6 @@ const _compileExpression: (
   exp: ExpressionNode,
   initCode: string
 ) => Parser<PegParseResult> = (exp: ExpressionNode, initCode: string) => {
-  // console.log(exp)
-
   switch (exp.type) {
     case "RuleReference":
       return ref<PegParseResult>(exp.ruleName)
@@ -144,7 +136,6 @@ const _compileExpression: (
             matchString: result.matchString,
             value: result.value
           }))
-    // .debug("hogehoge")
 
     case "LiteralMatcher":
       return literal(exp.str, exp.ignoreCase).map(res => toPegParseResult(res))

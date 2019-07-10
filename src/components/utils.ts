@@ -1,5 +1,6 @@
 import { repeat0 } from "./repeat"
 import { Parser } from "../types"
+import { resolveParser } from "../utils"
 
 /**
  * match any single character that appears in the given string
@@ -59,3 +60,8 @@ export const between = (
     return null
   })
 }
+
+export const ref = <T>(id: string) =>
+  new Parser<T>((c, s) => {
+    return resolveParser<T>(id, c.resolver).parse(c, s)
+  })
