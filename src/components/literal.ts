@@ -1,5 +1,10 @@
 import { Parser } from "../types"
 
+/**
+ * 文字列リテラルにマッチ
+ * @param text
+ * @param ignoreCase
+ */
 export const literal = (text: string, ignoreCase?: boolean) =>
   new Parser((_, s) => {
     if (ignoreCase) {

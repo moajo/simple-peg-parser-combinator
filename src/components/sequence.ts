@@ -1,6 +1,10 @@
 import { Parser, ParseResult, ParserIdentifier } from "../types"
 import { resolveParser } from "../utils"
 
+/**
+ * 連続したパターンにマッチ
+ * @param p1
+ */
 export function sequence<T>(p1: ParserIdentifier<T>): Parser<[T]>
 export function sequence<T1, T2>(
   p1: ParserIdentifier<T1>,

@@ -1,5 +1,5 @@
 import { repeat0 } from "./repeat"
-import { Parser } from "../types"
+import { Parser, ParserIdentifier } from "../types"
 import { resolveParser } from "../utils"
 
 /**
@@ -19,7 +19,6 @@ export const anyCharacterOf = (characters: string, ignoreCase?: boolean) =>
         }
       : null
   })
-// or(...Array.from(characters).map(s => literal(s)))
 
 export const whitespace = repeat0(anyCharacterOf(" \t\n\r")).map(it =>
   it.join("")
@@ -61,7 +60,7 @@ export const between = (
   })
 }
 
-export const ref = <T>(id: string) =>
+export const ref = <T>(id: ParserIdentifier<T>) =>
   new Parser<T>((c, s) => {
     return resolveParser<T>(id, c.resolver).parse(c, s)
   })
