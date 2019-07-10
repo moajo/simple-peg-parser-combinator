@@ -9,7 +9,8 @@ import {
   andPredicate,
   notPredicate,
   EOF,
-  between
+  between,
+  regex
 } from "../src/index"
 import ParserResolver, { ParseContext, ParserCache } from "../src/context"
 
@@ -110,4 +111,13 @@ test("between", () => {
   expect(p.parse(pc, "z")!.length).toBe(1)
   expect(p.parse(pc, String.fromCharCode("a".codePointAt(0)! - 1))).toBe(null)
   expect(p.parse(pc, String.fromCharCode("z".codePointAt(0)! + 1))).toBe(null)
+})
+
+test("regex", () => {
+  const pc = new ParseContext(new ParserCache(), new ParserResolver())
+  const p = regex(/[4-8]+/)
+  expect(p.parse(pc, "a")).toBe(null)
+  expect(p.parse(pc, "f67")).toBe(null)
+  expect(p.parse(pc, "34567")).toBe(null)
+  expect(p.parse(pc, "45678abc")!.value).toBe("45678")
 })

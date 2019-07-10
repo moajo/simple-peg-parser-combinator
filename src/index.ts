@@ -5,6 +5,7 @@ export * from "./components/utils"
 export * from "./components/sequence"
 export * from "./components/repeat"
 export * from "./components/predicate"
+export * from "./components/regex"
 
 export default () => {
   console.log("hello")
