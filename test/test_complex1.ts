@@ -1,5 +1,5 @@
 import { literal, or, repeat1, repeat0, sequence } from "../src/index"
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 import { ParserIdentifier } from "../src/types"
 
 describe("expression", () => {

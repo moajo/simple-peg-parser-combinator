@@ -1,6 +1,6 @@
 import { Parser, ParseResult, ParserIdentifier } from "./types"
 
-export default class ParserResolver {
+export class ParserResolver {
   private mem: { [key: string]: ParserIdentifier<any> } = {}
   add<T>(name: string, parser: ParserIdentifier<T>): ParserIdentifier<T> {
     this.mem[name] = parser

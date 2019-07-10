@@ -1,5 +1,5 @@
 import { literal, or, sequence } from "../src/index"
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 
 describe("expression", () => {
   let c = new ParserResolver()

@@ -15,7 +15,7 @@ import {
 } from "./01.literal"
 import { Identifier } from "./04.identifier"
 import { StringLiteral } from "./05.string"
-import { CodeBlock } from "./01.1.codeblock"
+import { CodeBlock, Code } from "./01.1.codeblock"
 import { PrimaryExpression } from "./08.primaryExpression"
 import { Initializer } from "./03.1.initializer"
 import { pickFirst, pickSecond } from "../utils"
@@ -31,6 +31,8 @@ import {
   makeSuffixExpressionNode,
   makePrefixExpressionNode
 } from "./ast"
+import { ClosedParser } from "../types"
+import { ParserResolver, ParseContext, ParserCache } from "../context"
 
 export const PrefixedOperator = or(
   dollar.mapTo(PrefixedOperatorEnum.TEXT),
@@ -123,3 +125,8 @@ export const Grammar = sequence(
     return makeGrammerNode(rules, init)
   }
 })
+const pr = new ParserResolver()
+const pc = new ParseContext(new ParserCache(), pr)
+pr.add("Expression", Expression)
+pr.add("Code", Code)
+export const PEG = new ClosedParser(Grammar, pc)

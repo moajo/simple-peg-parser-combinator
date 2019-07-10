@@ -1,4 +1,4 @@
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 import { Grammar, Expression, Rule } from "../src/peg/09.grammer"
 import * as fs from "fs"
 import { StringLiteral, LiteralMatcher } from "../src/peg/05.string"

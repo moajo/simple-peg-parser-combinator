@@ -1,5 +1,5 @@
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression } from "../src/peg/09.grammer"
+import { ParserResolver } from "../src/context"
+import { Expression, PEG } from "../src/peg/09.grammer"
 import * as fs from "fs"
 import { Code } from "../src/peg/01.1.codeblock"
 import { compile } from "../src/peg/compiler"
@@ -17,12 +17,7 @@ describe("compiler", () => {
   pr.add("Code", Code)
 
   test("compiler", () => {
-    const pr = new ParserResolver()
-    const pc = new ParseContext(new ParserCache(), pr)
-    pr.add("Expression", Expression)
-    pr.add("Code", Code)
-    const original_ast = Grammar.parse(pc, parser_generator_syntax_definition)!
-      .value
+    const original_ast = PEG.parse(parser_generator_syntax_definition)!.value
     const original_parser_generator = compile(original_ast)
 
     const self_hosted_ast = original_parser_generator.parse(

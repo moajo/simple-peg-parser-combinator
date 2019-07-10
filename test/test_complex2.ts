@@ -1,5 +1,5 @@
 import { literal, or, repeat1 } from "../src/index"
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 import { sequence } from "../src/components/sequence"
 import { zeroOrOne, repeat0 } from "../src/components/repeat"
 import { whitespace, anyCharacterOf } from "../src/components/utils"

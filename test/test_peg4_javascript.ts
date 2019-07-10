@@ -1,5 +1,5 @@
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression } from "../src/peg/09.grammer"
+import { ParserResolver } from "../src/context"
+import { Expression, PEG } from "../src/peg/09.grammer"
 import * as fs from "fs"
 import { Code } from "../src/peg/01.1.codeblock"
 import { compile } from "../src/peg/compiler"
@@ -14,11 +14,7 @@ describe("compiler", () => {
   pr.add("Code", Code)
 
   test("compiler", () => {
-    const pr = new ParserResolver()
-    const pc = new ParseContext(new ParserCache(), pr)
-    pr.add("Expression", Expression)
-    pr.add("Code", Code)
-    const ast = Grammar.parse(pc, js_syntax_definition)!.value
+    const ast = PEG.parse(js_syntax_definition)!.value
     const js_parser = compile(ast)
     expect(js_parser.parse("1")!.value).toStrictEqual({
       type: "Program",

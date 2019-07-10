@@ -6,7 +6,7 @@ import {
   PrefixedOperatorEnum,
   SuffixedOperatorEnum
 } from "./ast"
-import ParserResolver, { ParseContext, ParserCache } from "../context"
+import { ParseContext, ParserCache, ParserResolver } from "../context"
 import { resolveParser } from "../utils"
 import { or, sequence } from ".."
 import { literal } from "../components/literal"

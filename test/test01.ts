@@ -12,7 +12,7 @@ import {
   between,
   regex
 } from "../src/index"
-import ParserResolver, { ParseContext, ParserCache } from "../src/context"
+import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 
 test("literal", () => {
   const l = literal("hoge")
