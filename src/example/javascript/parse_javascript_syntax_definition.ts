@@ -1,7 +1,7 @@
-import { ParserResolver, ParseContext, ParserCache } from "../context"
-import { Grammar, Expression } from "../peg/07.grammer"
+import { ParserResolver, ParseContext, ParserCache } from "../../context"
+import { Grammar, Expression } from "../../peg/07.grammer"
 import * as fs from "fs"
-import { Code } from "../peg/03.codeBlock"
+import { Code } from "../../peg/03.codeBlock"
 
 const pegSource = "./sample_files/peg/javascript.pegjs"
 

@@ -41,7 +41,15 @@ expect(js_parser.parse("1+1")!.value).toStrictEqual({
 npm i
 ```
 
+# build
+
+```
+npm run build
+```
+
 # test
+
+see: `/test/*`
 
 ```
 npm t
@@ -49,7 +57,8 @@ npm t
 
 # examples
 
-see: `/test/*`
+see: `/src/examples/*`
+npm run exec -- src/example/javascript/parse_javascript.ts
 
 # reference
 
