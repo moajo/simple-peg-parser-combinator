@@ -1,9 +1,9 @@
-import ParserResolver, { ParseContext, ParserCache } from "../context"
-import { Grammar, Expression } from "../peg/09.grammer"
+import { ParserResolver, ParseContext, ParserCache } from "../context"
+import { Grammar, Expression } from "../peg/07.grammer"
 import * as fs from "fs"
-import { Code } from "../peg/01.1.codeblock"
 import { compile } from "../peg/compiler"
 import { GrammerNode } from "../peg/ast"
+import { Code } from "../peg/03.codeBlock"
 
 const pegSource = "./peg/javascript.pegjs"
 const pegCompiled = "./peg/javascript.pegjs.ast.json"

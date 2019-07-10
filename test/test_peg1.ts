@@ -1,7 +1,6 @@
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression, Rule } from "../src/peg/09.grammer"
+import { Grammar, Expression, Rule } from "../src/peg/07.grammer"
 import * as fs from "fs"
-import { StringLiteral, LiteralMatcher } from "../src/peg/05.string"
 import {
   SuffixedOperatorEnum,
   makeLiteralMatcherNode,
@@ -22,9 +21,10 @@ import {
   PrimaryExpression,
   RuleReferenceExpression,
   SemanticPredicateExpression
-} from "../src/peg/08.primaryExpression"
+} from "../src/peg/06.expression"
 import { CharacterClassMatcher, AnyMatcher } from "../src/peg/05.matcher"
-import { Code } from "../src/peg/01.1.codeblock"
+import { Code } from "../src/peg/03.codeBlock"
+import { StringLiteral, LiteralMatcher } from "../src/peg/01.literal"
 
 const arithmetics_src = fs.readFileSync("./peg/arithmetics.pegjs", {
   encoding: "utf8"

@@ -1,8 +1,9 @@
-import { literal, or, sequence, anyChar } from "../index"
+import { literal, or, sequence, anyChar, repeat0, zeroOrOne } from "../index"
 import { Zs, Lu, Ll, Lt, Lm, Lo, Nl, Mn, Mc, Nd, Pc } from "./00.unicode"
 import { between } from "../components/utils"
 import { notPredicate } from "../components/predicate"
-import { pickSecond } from "../utils"
+import { pickSecond, pickCenter } from "../utils"
+import { makeLiteralMatcherNode } from "./ast"
 
 export const dollar = literal("$")
 export const and = literal("&")
@@ -124,3 +125,39 @@ export const EscapeSequence = or(
   HexEscapeSequence,
   UnicodeEscapeSequence
 )
+
+export const DoubleStringCharacter = or(
+  sequence(
+    notPredicate(or(double_quote, backslash, LineTerminator)),
+    SourceCharacter
+  ).map(pickSecond),
+  sequence(backslash, EscapeSequence).map(pickSecond),
+  LineContinuation
+)
+
+export const SingleStringCharacter = or(
+  sequence(
+    notPredicate(or(single_quote, backslash, LineTerminator)),
+    SourceCharacter
+  ).map(pickSecond),
+  sequence(backslash, EscapeSequence).map(pickSecond),
+  LineContinuation
+)
+
+export const StringLiteral = or(
+  sequence(
+    double_quote,
+    repeat0(DoubleStringCharacter).map(a => a.join("")),
+    double_quote
+  ).map(pickCenter),
+  sequence(
+    single_quote,
+    repeat0(SingleStringCharacter).map(a => a.join("")),
+    single_quote
+  ).map(pickCenter)
+)
+
+export const LiteralMatcher = sequence(
+  StringLiteral,
+  zeroOrOne(literal("i")).map(v => v !== null)
+).map(([str, ignoreCase]) => makeLiteralMatcherNode(str, ignoreCase))

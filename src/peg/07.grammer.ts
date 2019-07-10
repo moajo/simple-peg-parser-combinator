@@ -1,7 +1,6 @@
 import { literal, or } from "../index"
 import { sequence } from "../components/sequence"
 import { zeroOrOne, repeat0, repeat1 } from "../components/repeat"
-import { _, __, EOS } from "./03.spaces"
 import {
   dollar,
   and,
@@ -11,13 +10,12 @@ import {
   exclamation,
   question,
   star,
-  plus
+  plus,
+  StringLiteral
 } from "./01.literal"
 import { Identifier } from "./04.identifier"
-import { StringLiteral } from "./05.string"
-import { CodeBlock, Code } from "./01.1.codeblock"
-import { PrimaryExpression } from "./08.primaryExpression"
-import { Initializer } from "./03.1.initializer"
+import { PrimaryExpression } from "./06.expression"
+import { Initializer, CodeBlock, Code } from "./03.codeBlock"
 import { pickFirst, pickSecond } from "../utils"
 import {
   SuffixedOperatorEnum,
@@ -33,6 +31,7 @@ import {
 } from "./ast"
 import { ClosedParser } from "../types"
 import { ParserResolver, ParseContext, ParserCache } from "../context"
+import { __, EOS } from "./02.blank"
 
 export const PrefixedOperator = or(
   dollar.mapTo(PrefixedOperatorEnum.TEXT),

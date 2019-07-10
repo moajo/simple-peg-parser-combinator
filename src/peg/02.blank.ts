@@ -1,10 +1,13 @@
-import { or, sequence, repeat0, notPredicate } from "../index"
+import { or, sequence, repeat0, notPredicate, EOF, zeroOrOne } from "../index"
 import {
   SourceCharacter,
   kakko_comment,
   kokka_comment,
   comment_head,
-  LineTerminator
+  LineTerminator,
+  WhiteSpace,
+  LineTerminatorSequence,
+  semicolon
 } from "./01.literal"
 
 export const MultiLineComment = sequence(
@@ -27,3 +30,16 @@ export const SingleLineComment = sequence(
 )
 
 export const Comment = or(MultiLineComment, SingleLineComment)
+
+export const __ = repeat0(
+  or(WhiteSpace, LineTerminatorSequence, Comment)
+).mapTo("")
+export const _ = repeat0(
+  or(WhiteSpace, MultiLineCommentNoLineTerminator)
+).mapTo("")
+
+export const EOS = or(
+  sequence(__, semicolon),
+  sequence(_, zeroOrOne(SingleLineComment), LineTerminatorSequence),
+  sequence(__, EOF)
+).mapTo("")

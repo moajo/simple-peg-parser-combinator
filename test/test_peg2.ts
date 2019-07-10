@@ -1,7 +1,7 @@
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression } from "../src/peg/09.grammer"
+import { Grammar, Expression } from "../src/peg/07.grammer"
 import * as fs from "fs"
-import { Code } from "../src/peg/01.1.codeblock"
+import { Code } from "../src/peg/03.codeBlock"
 
 const src = fs.readFileSync("./peg/pegjs.pegjs", {
   encoding: "utf8"

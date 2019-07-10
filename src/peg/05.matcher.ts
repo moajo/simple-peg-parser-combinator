@@ -1,7 +1,6 @@
 import { literal, or } from "../index"
 import { sequence } from "../components/sequence"
 import { zeroOrOne, repeat0 } from "../components/repeat"
-import { __, _ } from "./03.spaces"
 import {
   SourceCharacter,
   LineTerminator,

@@ -1,5 +1,5 @@
 {
-
+  // セルフホストしたPEGパーサ
 }
 
 // ---- Syntactic Grammar -----

@@ -1,9 +1,12 @@
 import { or, notPredicate, zeroOrOne, sequence } from "../index"
-import { _, __ } from "./03.spaces"
-import { kakko_s, kokka_s, equal } from "./01.literal"
+import {
+  kakko_s,
+  kokka_s,
+  equal,
+  StringLiteral,
+  LiteralMatcher
+} from "./01.literal"
 import { Identifier } from "./04.identifier"
-import { StringLiteral, LiteralMatcher } from "./05.string"
-import { CodeBlock } from "./01.1.codeblock"
 import {
   SemanticPredicateOperator,
   CharacterClassMatcher,
@@ -16,6 +19,8 @@ import {
   makeSemanticPredicateNode
 } from "./ast"
 import { ParserIdentifier } from "../types"
+import { CodeBlock } from "./03.codeBlock"
+import { __ } from "./02.blank"
 
 export const RuleReferenceExpression = sequence(
   Identifier,

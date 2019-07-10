@@ -9,7 +9,6 @@ import {
   underscore,
   backslash
 } from "./01.literal"
-import { __, _ } from "./03.spaces"
 
 export const IdentifierStart = or(UnicodeLetter, dollar, underscore, sequence(
   backslash,

@@ -1,8 +1,8 @@
 import { ParserResolver } from "../src/context"
-import { Expression, PEG } from "../src/peg/09.grammer"
+import { Expression, PEG } from "../src/peg/07.grammer"
 import * as fs from "fs"
-import { Code } from "../src/peg/01.1.codeblock"
 import { compile } from "../src/peg/compiler"
+import { Code } from "../src/peg/03.codeBlock"
 
 const js_syntax_definition = fs.readFileSync("./peg/javascript.pegjs", {
   encoding: "utf8"
