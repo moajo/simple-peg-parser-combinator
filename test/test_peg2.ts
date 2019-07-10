@@ -3,7 +3,7 @@ import { Grammar, Expression } from "../src/peg/07.grammer"
 import * as fs from "fs"
 import { Code } from "../src/peg/03.codeBlock"
 
-const src = fs.readFileSync("./peg/pegjs.pegjs", {
+const src = fs.readFileSync("./sample_files/peg/pegjs.pegjs", {
   encoding: "utf8"
 })
 

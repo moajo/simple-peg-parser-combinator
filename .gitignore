@@ -81,4 +81,4 @@ typings/
 .dynamodb/ 
 
 dst
-peg/*ast.json
+*ast.json

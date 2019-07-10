@@ -4,9 +4,12 @@ import * as fs from "fs"
 import { compile } from "../src/peg/compiler"
 import { Code } from "../src/peg/03.codeBlock"
 
-const js_syntax_definition = fs.readFileSync("./peg/javascript.pegjs", {
-  encoding: "utf8"
-})
+const js_syntax_definition = fs.readFileSync(
+  "./sample_files/peg/javascript.pegjs",
+  {
+    encoding: "utf8"
+  }
+)
 
 describe("compiler", () => {
   const pr = new ParserResolver()

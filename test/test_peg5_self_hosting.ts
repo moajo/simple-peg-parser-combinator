@@ -5,7 +5,7 @@ import { compile } from "../src/peg/compiler"
 import { Code } from "../src/peg/03.codeBlock"
 
 const parser_generator_syntax_definition = fs.readFileSync(
-  "./peg/pegjs.ported.pegjs",
+  "./sample_files/peg/pegjs.ported.pegjs",
   {
     encoding: "utf8"
   }

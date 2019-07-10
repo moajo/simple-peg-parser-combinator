@@ -26,9 +26,12 @@ import { CharacterClassMatcher, AnyMatcher } from "../src/peg/05.matcher"
 import { Code } from "../src/peg/03.codeBlock"
 import { StringLiteral, LiteralMatcher } from "../src/peg/01.literal"
 
-const arithmetics_src = fs.readFileSync("./peg/arithmetics.pegjs", {
-  encoding: "utf8"
-})
+const arithmetics_src = fs.readFileSync(
+  "./sample_files/peg/arithmetics.pegjs",
+  {
+    encoding: "utf8"
+  }
+)
 
 test("string literal", () => {
   const pc = new ParseContext(new ParserCache(), new ParserResolver())

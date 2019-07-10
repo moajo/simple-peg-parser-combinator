@@ -5,8 +5,8 @@ import { compile } from "../peg/compiler"
 import { GrammerNode } from "../peg/ast"
 import { Code } from "../peg/03.codeBlock"
 
-const pegSource = "./peg/javascript.pegjs"
-const pegCompiled = "./peg/javascript.pegjs.ast.json"
+const pegSource = "./sample_files/peg/javascript.pegjs"
+const pegCompiled = pegSource + ".ast.json"
 
 if (!fs.existsSync(pegCompiled)) {
   console.log("no cache")

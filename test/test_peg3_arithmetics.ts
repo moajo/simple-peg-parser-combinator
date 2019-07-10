@@ -4,9 +4,12 @@ import * as fs from "fs"
 import { compile } from "../src/peg/compiler"
 import { Code } from "../src/peg/03.codeBlock"
 
-const arithmetics_src = fs.readFileSync("./peg/arithmetics.pegjs", {
-  encoding: "utf8"
-})
+const arithmetics_src = fs.readFileSync(
+  "./sample_files/peg/arithmetics.pegjs",
+  {
+    encoding: "utf8"
+  }
+)
 
 describe("compiler", () => {
   const pr = new ParserResolver()
