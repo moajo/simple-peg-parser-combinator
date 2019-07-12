@@ -18,9 +18,9 @@ describe("compiler", () => {
 
   test("compiler", () => {
     const original_ast = PEG.parse(parser_generator_syntax_definition)!.value
-    const original_parser_generator = compile(original_ast)
+    const original_parser = compile(original_ast)
 
-    const self_hosted_ast = original_parser_generator.parse(
+    const self_hosted_ast = original_parser.parse(
       parser_generator_syntax_definition
     )
     expect(self_hosted_ast).not.toBe(null)
