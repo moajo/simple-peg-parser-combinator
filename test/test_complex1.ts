@@ -1,6 +1,6 @@
-import { literal, or, repeat1, repeat0, sequence } from "../src/index"
+import { literal, or, repeat1, repeat0, sequence, ref } from "../src/index"
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
-import { ParserIdentifier } from "../src/types"
+import { Parser } from "../src/types"
 
 describe("expression", () => {
   const digits = repeat1(
@@ -18,26 +18,26 @@ describe("expression", () => {
   c.add("(", literal("("))
   c.add(")", literal(")"))
   const bracedExpression = sequence(
-    "(",
-    "expression" as ParserIdentifier<number>,
-    ")"
+    ref("("),
+    ref("expression") as Parser<number>,
+    ref(")")
   ).map(([_, exp, __]) => exp)
   const factor = or(bracedExpression, digits)
 
-  c.add("*/", or("*", "/"))
-  c.add("+-", or("+", "-"))
+  c.add("*/", or(ref("*"), ref("/")))
+  c.add("+-", or(ref("+"), ref("-")))
 
   const term = sequence(
     factor,
     repeat0(
-      sequence("*/", factor).map(([op, num]) =>
+      sequence(ref("*/"), factor).map(([op, num]) =>
         op == "*" ? (a: number) => a * num : (a: number) => a / num
       )
     )
   ).map(([num, ops]) => ops.reduce((value, op) => op(value), num))
 
   const exprTail = repeat0(
-    sequence("+-", term).map(vs =>
+    sequence(ref("+-"), term).map(vs =>
       vs[0] == "+" ? (a: number) => a + vs[1] : (a: number) => a - vs[1]
     )
   )

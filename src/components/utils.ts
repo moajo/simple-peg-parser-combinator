@@ -1,5 +1,5 @@
 import { repeat0 } from "./repeat"
-import { Parser, ParserIdentifier } from "../types"
+import { Parser } from "../types"
 import { resolveParser } from "../utils"
 
 /**
@@ -63,7 +63,7 @@ export const between = (
   })
 }
 
-export const ref = <T>(id: ParserIdentifier<T>) =>
-  new Parser<T>((c, s, pos) => {
-    return resolveParser<T>(id, c.resolver).parse(c, s, pos)
-  })
+export const ref = <T>(id: string) =>
+  new Parser<T>((c, s, pos) =>
+    resolveParser<T>(id, c.resolver).parse(c, s, pos)
+  )

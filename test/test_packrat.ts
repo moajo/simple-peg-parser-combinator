@@ -1,4 +1,4 @@
-import { literal, or, sequence } from "../src/index"
+import { literal, or, sequence, ref } from "../src/index"
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 
 describe("expression", () => {
@@ -8,8 +8,8 @@ describe("expression", () => {
   const one = literal("1")
   const plus = literal("+")
   const minus = literal("-")
-  const P = or(sequence(kakko, "A", kokka), one)
-  const A = or(sequence(P, plus, "A"), sequence(P, minus, "A"), P)
+  const P = or(sequence(kakko, ref("A"), kokka), one)
+  const A = or(sequence(P, plus, ref("A")), sequence(P, minus, ref("A")), P)
 
   c.add("A", A)
   c.add("S", A)

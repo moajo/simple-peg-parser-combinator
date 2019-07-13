@@ -2,7 +2,7 @@ import { literal, or, repeat1 } from "../src/index"
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
 import { sequence } from "../src/components/sequence"
 import { zeroOrOne, repeat0 } from "../src/components/repeat"
-import { whitespace, anyCharacterOf } from "../src/components/utils"
+import { whitespace, anyCharacterOf, ref } from "../src/components/utils"
 
 // see: https://github.com/pegjs/pegjs/blob/master/examples/json.pegjs
 
@@ -15,11 +15,19 @@ describe("json", () => {
   c.add(",", sequence(whitespace, literal(","), whitespace))
   c.add(":", sequence(whitespace, literal(":"), whitespace))
 
-  c.add("JSON", sequence(whitespace, "value", whitespace).map(vs => vs[1]))
+  c.add("JSON", sequence(whitespace, ref("value"), whitespace).map(vs => vs[1]))
 
   c.add(
     "value",
-    or("false", "null", "true", "object", "array", "number", "string")
+    or(
+      ref("false"),
+      ref("null"),
+      ref("true"),
+      ref("object"),
+      ref("array"),
+      ref("number"),
+      ref("string")
+    )
   )
   c.add(
     "false",
@@ -41,12 +49,14 @@ describe("json", () => {
   )
 
   // 4. object
-  const member = sequence("string", ":", "value").map(([key, _, value]) => ({
-    key,
-    value
-  }))
+  const member = sequence(ref("string"), ref(":"), ref("value")).map(
+    ([key, _, value]) => ({
+      key,
+      value
+    })
+  )
   const objectValues = zeroOrOne(
-    sequence(member, repeat0(sequence(",", member).map(vs => vs[1]))).map(
+    sequence(member, repeat0(sequence(ref(","), member).map(vs => vs[1]))).map(
       vs => {
         return [vs[0]].concat(vs[1])
       }
@@ -54,7 +64,7 @@ describe("json", () => {
   ).map(v => (v == null ? [] : v))
   c.add(
     "object",
-    sequence("{", objectValues, "}").map(vs => {
+    sequence(ref("{"), objectValues, ref("}")).map(vs => {
       const a = vs[1]
       let obj: { [key: string]: any } = {}
       a.forEach((member: { key: string; value: any }) => {
@@ -65,9 +75,12 @@ describe("json", () => {
   )
 
   // 5. array
-  c.add("array", sequence("[", "arrayValues", "]").map(vs => vs[1]))
-  const arrayTail = repeat0(sequence(",", "value").map(vs => vs[1]))
-  const arrayValues1 = sequence("value", arrayTail).map(vs =>
+  c.add(
+    "array",
+    sequence(ref("["), ref("arrayValues"), ref("]")).map(vs => vs[1])
+  )
+  const arrayTail = repeat0(sequence(ref(","), ref("value")).map(vs => vs[1]))
+  const arrayValues1 = sequence(ref("value"), arrayTail).map(vs =>
     [vs[0]].concat(vs[1])
   )
   c.add("arrayValues", zeroOrOne(arrayValues1).map(v => (v == null ? [] : v)))

@@ -1,4 +1,4 @@
-import { or, notPredicate, zeroOrOne, sequence } from "../index"
+import { or, notPredicate, zeroOrOne, sequence, ref } from "../index"
 import {
   kakko_s,
   kokka_s,
@@ -18,9 +18,9 @@ import {
   makeRuleReferenceNode,
   makeSemanticPredicateNode
 } from "./ast"
-import { ParserIdentifier } from "../types"
 import { CodeBlock } from "./03.codeBlock"
 import { __ } from "./02.blank"
+import { Parser } from "../types"
 
 export const RuleReferenceExpression = sequence(
   Identifier,
@@ -44,7 +44,7 @@ export const PrimaryExpression = or(
   sequence(
     kakko_s,
     __,
-    "Expression" as ParserIdentifier<ExpressionNode>,
+    ref("Expression") as Parser<ExpressionNode>,
     __,
     kokka_s
   ).map(a => a[2])

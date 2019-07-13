@@ -1,13 +1,12 @@
-import { Parser, ParserIdentifier } from "../types"
-import { resolveParser } from "../utils"
+import { Parser } from "../types"
 
-export const repeat = <T>(parserId: ParserIdentifier<T>, minCount: number) =>
+export const repeat = <T>(parserId: Parser<T>, minCount: number) =>
   new Parser((pc, s, pos) => {
     let c = 0
     let total = 0
     let values: T[] = []
     while (true) {
-      const result = resolveParser(parserId, pc.resolver).parse(pc, s, pos)
+      const result = parserId.parse(pc, s, pos)
       if (result === null) {
         break
       }
@@ -26,14 +25,14 @@ export const repeat = <T>(parserId: ParserIdentifier<T>, minCount: number) =>
   })
 
 // 1 or more
-export const repeat1 = <T>(parser: ParserIdentifier<T>) => repeat(parser, 1)
+export const repeat1 = <T>(parser: Parser<T>) => repeat(parser, 1)
 
 // 0 or more
-export const repeat0 = <T>(parser: ParserIdentifier<T>) => repeat(parser, 0)
+export const repeat0 = <T>(parser: Parser<T>) => repeat(parser, 0)
 
-export const zeroOrOne = <T>(parser: ParserIdentifier<T>) =>
+export const zeroOrOne = <T>(parser: Parser<T>) =>
   new Parser((pc, s, pos) => {
-    const result = resolveParser(parser, pc.resolver).parse(pc, s, pos)
+    const result = parser.parse(pc, s, pos)
     if (result) {
       return result
     } else {

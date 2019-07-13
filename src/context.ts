@@ -1,10 +1,10 @@
-import { Parser, ParseResult, ParserIdentifier } from "./types"
+import { Parser, ParseResult } from "./types"
 
 export class ParserResolver {
-  private mem: { [key: string]: ParserIdentifier<any> } = {}
-  add<T>(name: string, parser: ParserIdentifier<T>): ParserIdentifier<T> {
+  private mem: { [key: string]: Parser<any> } = {}
+  add<T>(name: string, parser: Parser<T>): Parser<T> {
     this.mem[name] = parser
-    return name
+    return parser
   }
   get(name: string): Parser<any> {
     const result = this.mem[name]

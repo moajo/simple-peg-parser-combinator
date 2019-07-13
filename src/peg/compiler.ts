@@ -7,7 +7,6 @@ import {
   SuffixedOperatorEnum
 } from "./ast"
 import { ParseContext, ParserCache, ParserResolver } from "../context"
-import { resolveParser } from "../utils"
 import { or, sequence } from ".."
 import { literal } from "../components/literal"
 import { notPredicate } from "../components/predicate"
@@ -192,7 +191,7 @@ export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
       _compileExpression(ruleNode.expression, initCode ? initCode : "")
     )
   )
-  const firstRuleId = compiledRules[0]
+  const firstRule = compiledRules[0]
 
   const parser = new Parser((c, s, pos) => {
     // if (initCode) {
@@ -210,7 +209,6 @@ export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
     //   console.log("aaaaaaaaa", postKeys)
     //   throw new Error("q")
     // }
-    const firstRule = resolveParser(firstRuleId, c.resolver)
     return firstRule.parse(c, s, pos)
   }).map(result => result.value)
   return new ClosedParser(parser, new ParseContext(new ParserCache(), resolver))

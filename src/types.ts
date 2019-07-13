@@ -1,8 +1,5 @@
 import { ParseContext } from "./context"
 
-// TODO: utils.refに統合？
-export type ParserIdentifier<T> = string | Parser<T>
-
 export type ParseResult<T> = {
   /**
    * マッチした長さ
