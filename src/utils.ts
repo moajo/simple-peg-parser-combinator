@@ -1,5 +1,9 @@
 import { ParserResolver } from "./context"
-import { Parser } from "./types"
+import { Parser, ParserOrLiteral } from "./types"
+import { literal } from "."
+
+export const toParser = <T>(p: ParserOrLiteral<T>) =>
+  typeof p === "string" ? literal(p) : p
 
 // TODO: utils.refに統合？
 export const resolveParser = <T>(

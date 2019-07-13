@@ -1,12 +1,13 @@
-import { Parser } from "../types"
+import { Parser, ParserOrLiteral } from "../types"
+import { toParser } from "../utils"
 
-export const repeat = <T>(parserId: Parser<T>, minCount: number) =>
+export const repeat = <T>(parser: ParserOrLiteral<T>, minCount: number) =>
   new Parser((pc, s, pos) => {
     let c = 0
     let total = 0
-    let values: T[] = []
+    let values: any[] = []
     while (true) {
-      const result = parserId.parse(pc, s, pos)
+      const result = toParser<T>(parser).parse(pc, s, pos)
       if (result === null) {
         break
       }
@@ -20,7 +21,7 @@ export const repeat = <T>(parserId: Parser<T>, minCount: number) =>
     }
     return {
       length: total,
-      value: values
+      value: values as T[]
     }
   })
 

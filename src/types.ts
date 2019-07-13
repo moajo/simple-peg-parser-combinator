@@ -26,7 +26,8 @@ export class Parser<T> {
       c: ParseContext,
       s: string,
       position: number
-    ) => ParseResult<T> | null
+    ) => ParseResult<T> | null,
+    public getId: () => any = () => this
   ) {}
 
   parse(c: ParseContext, s: string, position = 0): ParseResult<T> | null {
@@ -65,6 +66,8 @@ export class Parser<T> {
     })
   }
 }
+
+export type ParserOrLiteral<T> = string | Parser<T>
 
 /**
  * Parser bound to a fixed resolver.

@@ -22,7 +22,7 @@ export class ParserCache {
   private _memory: {
     [text: string]: {
       [position: number]: {
-        parser: Parser<any>
+        key: any
         result: ParseResult<any> | null
       }[]
     }
@@ -41,7 +41,7 @@ export class ParserCache {
       this._memory[text][position] = []
     }
     this._memory[text][position].push({
-      parser,
+      key: parser.getId(),
       result
     })
   }
@@ -53,9 +53,8 @@ export class ParserCache {
     if (!this._memory[text][position]) {
       return null
     }
-    const cache = this._memory[text][position].find(
-      obj => obj.parser === parser
-    )
+    const key = parser.getId()
+    const cache = this._memory[text][position].find(obj => obj.key === key)
     if (!cache) {
       return null
     }
