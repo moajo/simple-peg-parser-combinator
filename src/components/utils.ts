@@ -7,15 +7,15 @@ import { resolveParser } from "../utils"
  * @param characters
  */
 export const anyCharacterOf = (characters: string, ignoreCase?: boolean) =>
-  new Parser((_, s) => {
+  new Parser((_, s, pos) => {
     if (ignoreCase) {
       s = s.toLowerCase()
       characters = characters.toLowerCase()
     }
-    return characters.includes(s[0])
+    return characters.includes(s[pos])
       ? {
           length: 1,
-          value: s[0]
+          value: s[pos]
         }
       : null
   })
@@ -27,8 +27,8 @@ export const whitespace = repeat0(anyCharacterOf(" \t\n\r")).map(it =>
 /**
  * end of file
  */
-export const EOF = new Parser((_, s) => {
-  return s.length == 0
+export const EOF = new Parser((_, s, pos) => {
+  return s.length == pos
     ? {
         length: 0,
         value: ""
@@ -49,11 +49,14 @@ export const between = (
 ) => {
   const start = startChar.codePointAt(0)!
   const end = endChar.codePointAt(0)!
-  return new Parser((_, s) => {
-    if (s.length >= 1) {
-      const codePoint = (ignoreCase ? s[0].toLowerCase() : s).codePointAt(0)!
+  return new Parser((_, s, pos) => {
+    if (s.length != pos) {
+      const codePoint = (ignoreCase
+        ? s[pos].toLowerCase()
+        : s[pos]
+      ).codePointAt(0)!
       if (start <= codePoint && codePoint <= end) {
-        return { length: 1, value: s[0] }
+        return { length: 1, value: s[pos] }
       }
     }
     return null
@@ -61,6 +64,6 @@ export const between = (
 }
 
 export const ref = <T>(id: ParserIdentifier<T>) =>
-  new Parser<T>((c, s) => {
-    return resolveParser<T>(id, c.resolver).parse(c, s)
+  new Parser<T>((c, s, pos) => {
+    return resolveParser<T>(id, c.resolver).parse(c, s, pos)
   })

@@ -6,8 +6,8 @@ import { resolveParser } from "../utils"
  * @param parser
  */
 export const andPredicate = <T>(parser: ParserIdentifier<T>) =>
-  new Parser((c, s) => {
-    const predict = resolveParser(parser, c.resolver).parse(c, s)
+  new Parser((c, s, pos) => {
+    const predict = resolveParser(parser, c.resolver).parse(c, s, pos)
     if (predict) {
       return {
         length: 0,
@@ -22,8 +22,8 @@ export const andPredicate = <T>(parser: ParserIdentifier<T>) =>
  * @param parser
  */
 export const notPredicate = <T>(parser: ParserIdentifier<T>) =>
-  new Parser((c, s) => {
-    const predict = resolveParser(parser, c.resolver).parse(c, s)
+  new Parser((c, s, pos) => {
+    const predict = resolveParser(parser, c.resolver).parse(c, s, pos)
     if (!predict) {
       return {
         length: 0,

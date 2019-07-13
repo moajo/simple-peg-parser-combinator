@@ -36,9 +36,9 @@ export function or<T>(...parsers: ParserIdentifier<T>[]): Parser<T>
 export function or(...parsers: ParserIdentifier<any>[]): Parser<any>
 
 export function or(...parsers: ParserIdentifier<any>[]) {
-  return new Parser((c, s: string) => {
+  return new Parser((c, s, pos) => {
     for (let parser of parsers) {
-      const result = resolveParser(parser, c.resolver).parse(c, s)
+      const result = resolveParser(parser, c.resolver).parse(c, s, pos)
       if (result !== null) {
         return result
       }

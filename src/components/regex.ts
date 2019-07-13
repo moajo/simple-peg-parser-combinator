@@ -1,8 +1,8 @@
 import { Parser } from "../types"
 
 export const regex = (pattern: RegExp) =>
-  new Parser((_, s) => {
-    const m = pattern.exec(s)
+  new Parser((_, s, pos) => {
+    const m = pattern.exec(s.substr(pos))
     if (m && m.index === 0) {
       const matchString = m[0]
       return {

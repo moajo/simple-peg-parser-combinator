@@ -1,4 +1,4 @@
-import { Parser, ParseResult, ParserIdentifier } from "../types"
+import { Parser, ParserIdentifier } from "../types"
 import { resolveParser } from "../utils"
 
 /**
@@ -49,21 +49,21 @@ export function sequence<T1, T2, T3, T4, T5, T6, T7>(
 export function sequence<T>(...parsers: ParserIdentifier<T>[]): Parser<T[]>
 export function sequence(...parsers: ParserIdentifier<any>[]): Parser<any[]>
 export function sequence(...parsers: ParserIdentifier<any>[]) {
-  return new Parser((pc, s: string) => {
+  return new Parser((pc, s, pos) => {
     let total = 0
     let values = []
     for (let parser of parsers) {
-      const result = resolveParser(parser, pc.resolver).parse(pc, s)
+      const result = resolveParser(parser, pc.resolver).parse(pc, s, pos)
       if (result === null) {
         return null
       }
       total += result.length
       values.push(result.value)
-      s = s.substr(result.length)
+      pos += result.length
     }
     return {
       length: total,
       value: values
-    } as ParseResult<any[]>
+    }
   })
 }

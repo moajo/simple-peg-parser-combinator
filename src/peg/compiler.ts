@@ -194,7 +194,7 @@ export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
   )
   const firstRuleId = compiledRules[0]
 
-  const parser = new Parser((c, s) => {
+  const parser = new Parser((c, s, pos) => {
     // if (initCode) {
     //   const preKeys = new Set(Object.getOwnPropertyNames(global))
     //   console.log("@@pre", preKeys.size)
@@ -211,7 +211,7 @@ export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
     //   throw new Error("q")
     // }
     const firstRule = resolveParser(firstRuleId, c.resolver)
-    return firstRule.parse(c, s)
+    return firstRule.parse(c, s, pos)
   }).map(result => result.value)
   return new ClosedParser(parser, new ParseContext(new ParserCache(), resolver))
 }

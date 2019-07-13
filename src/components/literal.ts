@@ -5,13 +5,16 @@ import { Parser } from "../types"
  * @param text
  * @param ignoreCase
  */
-export const literal = (text: string, ignoreCase?: boolean) =>
-  new Parser((_, s) => {
+export const literal = (text: string, ignoreCase?: boolean) => {
+  if (ignoreCase) {
+    text = text.toLowerCase()
+  }
+  return new Parser((_, s, pos) => {
     if (ignoreCase) {
       s = s.toLowerCase()
-      text = text.toLowerCase()
     }
-    if (s.startsWith(text)) {
+
+    if (s.startsWith(text, pos)) {
       return {
         length: text.length,
         value: text
@@ -19,3 +22,4 @@ export const literal = (text: string, ignoreCase?: boolean) =>
     }
     return null
   })
+}

@@ -14,6 +14,6 @@ pr.add("Expression", Expression)
 pr.add("Code", Code)
 
 const pc = new ParseContext(new ParserCache(), pr)
-const ast = Grammar.parse(pc, js_syntax_definition)!.value
+const ast = Grammar.parse(pc, js_syntax_definition, 0)!.value
 
 console.log(JSON.stringify(ast, null, 2))

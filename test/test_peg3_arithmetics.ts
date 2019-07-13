@@ -21,7 +21,7 @@ describe("compiler", () => {
     const pc = new ParseContext(new ParserCache(), pr)
     pr.add("Expression", Expression)
     pr.add("Code", Code)
-    const ast = Grammar.parse(pc, arithmetics_src)!.value
+    const ast = Grammar.parse(pc, arithmetics_src, 0)!.value
     const res = compile(ast)
     expect(res.parse("1")!.value).toBe(1)
     expect(res.parse("1*1+4")!.value).toBe(1 * 1 + 4)

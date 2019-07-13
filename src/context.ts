@@ -20,24 +20,42 @@ export class ParserResolver {
 
 export class ParserCache {
   private _memory: {
-    [text: string]: { parser: Parser<any>; result: ParseResult<any> | null }[]
+    [text: string]: {
+      [position: number]: {
+        parser: Parser<any>
+        result: ParseResult<any> | null
+      }[]
+    }
   } = {}
 
-  cache<T>(text: string, parser: Parser<T>, result: ParseResult<T> | null) {
+  cache<T>(
+    text: string,
+    position: number,
+    parser: Parser<T>,
+    result: ParseResult<T> | null
+  ) {
     if (!this._memory[text]) {
-      this._memory[text] = []
+      this._memory[text] = {}
     }
-    this._memory[text].push({
+    if (!this._memory[text][position]) {
+      this._memory[text][position] = []
+    }
+    this._memory[text][position].push({
       parser,
       result
     })
   }
 
-  get<T>(text: string, parser: Parser<T>) {
+  get<T>(text: string, position: number, parser: Parser<T>) {
     if (!this._memory[text]) {
       return null
     }
-    const cache = this._memory[text].find(obj => obj.parser === parser)
+    if (!this._memory[text][position]) {
+      return null
+    }
+    const cache = this._memory[text][position].find(
+      obj => obj.parser === parser
+    )
     if (!cache) {
       return null
     }
@@ -50,15 +68,16 @@ export class ParserCache {
 
   cacheProxy<T>(
     text: string,
+    position: number,
     parser: Parser<T>,
     executor: () => ParseResult<T> | null
   ) {
-    const cache = this.get(text, parser)
+    const cache = this.get(text, position, parser)
     if (cache) {
       return cache
     }
     const execResult = executor()
-    this.cache(text, parser, execResult)
+    this.cache(text, position, parser, execResult)
     return execResult
   }
 }

@@ -25,17 +25,23 @@ export class Parser<T> {
      * コンビネータ本体
      * コンテキストと現在の検査対象文字列を受け取り、マッチすればParseResult<T>を、そうでなければnullを返すことが期待される
      */
-    private parser: (c: ParseContext, s: string) => ParseResult<T> | null
+    private parser: (
+      c: ParseContext,
+      s: string,
+      position: number
+    ) => ParseResult<T> | null
   ) {}
 
-  parse(c: ParseContext, s: string): ParseResult<T> | null {
-    return c.cache.cacheProxy(s, this, () => this.parser(c, s))
+  parse(c: ParseContext, s: string, position = 0): ParseResult<T> | null {
+    return c.cache.cacheProxy(s, position, this, () =>
+      this.parser(c, s, position)
+    )
   }
 
   map<U>(mapper: (result: T) => U): Parser<U> {
     const p = this.parser
-    return new Parser((c, s) => {
-      const res = p(c, s)
+    return new Parser((c, s, pos) => {
+      const res = p(c, s, pos)
       return res
         ? {
             length: res.length,
@@ -50,9 +56,9 @@ export class Parser<T> {
   }
 
   debug(message: string): Parser<T> {
-    return new Parser((c, s) => {
+    return new Parser((c, s, pos) => {
       console.log("@debug: " + message)
-      const res = this.parser(c, s)
+      const res = this.parser(c, s, pos)
       console.log(
         `@debug ${res ? "ok" : "ng"}: ` +
           message +
@@ -71,6 +77,6 @@ export class ClosedParser<T> {
 
   parse(s: string): ParseResult<T> | null {
     this.context.cache.clear()
-    return this.parser.parse(this.context, s)
+    return this.parser.parse(this.context, s, 0)
   }
 }
