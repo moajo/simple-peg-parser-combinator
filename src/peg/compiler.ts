@@ -1,6 +1,6 @@
 import { Parser, ClosedParser } from "../types"
 import {
-  GrammerNode,
+  GrammarNode,
   ExpressionNode,
   CharacterPart,
   PrefixedOperatorEnum,
@@ -180,7 +180,7 @@ const _compileExpression: (
   }
 }
 
-export const compile: (ast: GrammerNode) => ClosedParser<any> = ast => {
+export const compile: (ast: GrammarNode) => ClosedParser<any> = ast => {
   const { initCode, rules } = ast
 
   const resolver = new ParserResolver()

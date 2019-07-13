@@ -1,5 +1,5 @@
 import { ParserResolver, ParseContext, ParserCache } from "../../context"
-import { Grammar, Expression } from "../../peg/07.grammer"
+import { Grammar, Expression } from "../../peg/07.grammar"
 import * as fs from "fs"
 import { Code } from "../../peg/03.codeBlock"
 

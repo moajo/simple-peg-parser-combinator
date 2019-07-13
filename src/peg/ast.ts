@@ -204,17 +204,17 @@ export const makeRuleNode = (
     displayName
   } as RuleNode)
 
-export type GrammerNode = {
-  type: "Grammer"
+export type GrammarNode = {
+  type: "Grammar"
   rules: RuleNode[]
   initCode?: string
 }
-export const makeGrammerNode = (rules: RuleNode[], initCode?: string) =>
+export const makeGrammarNode = (rules: RuleNode[], initCode?: string) =>
   ({
-    type: "Grammer",
+    type: "Grammar",
     rules,
     initCode
-  } as GrammerNode)
+  } as GrammarNode)
 
 export type Node =
   | LiteralMatcherNode
@@ -222,4 +222,4 @@ export type Node =
   | RuleReferenceNode
   | ExpressionNode
   | RuleNode
-  | GrammerNode
+  | GrammarNode

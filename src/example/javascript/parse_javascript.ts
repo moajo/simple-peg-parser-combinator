@@ -1,8 +1,8 @@
 import { ParserResolver, ParseContext, ParserCache } from "../../context"
-import { Grammar, Expression } from "../../peg/07.grammer"
+import { Grammar, Expression } from "../../peg/07.grammar"
 import * as fs from "fs"
 import { compile } from "../../peg/compiler"
-import { GrammerNode } from "../../peg/ast"
+import { GrammarNode } from "../../peg/ast"
 import { Code } from "../../peg/03.codeBlock"
 
 const pegSource = "./sample_files/peg/javascript.pegjs"
@@ -29,7 +29,7 @@ const ast = JSON.parse(
   fs.readFileSync(pegCompiled, {
     encoding: "utf8"
   })
-) as GrammerNode
+) as GrammarNode
 
 const js_parser = compile(ast)
 

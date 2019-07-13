@@ -7,7 +7,7 @@
 Grammar
   = __ initializer:(@Initializer __)? rules:(@Rule __)+ {
   return {
-    type: "Grammer",
+    type: "Grammar",
     rules,
     initCode: initializer
   }

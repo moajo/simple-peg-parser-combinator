@@ -1,5 +1,5 @@
 import { ParserResolver, ParseContext, ParserCache } from "../src/context"
-import { Grammar, Expression, Rule } from "../src/peg/07.grammer"
+import { Grammar, Expression, Rule } from "../src/peg/07.grammar"
 import * as fs from "fs"
 import {
   SuffixedOperatorEnum,
@@ -15,7 +15,7 @@ import {
   makeCharacterRangeNode,
   makeChoiceExpressionNode,
   makeLabeledExpressionNode,
-  makeGrammerNode
+  makeGrammarNode
 } from "../src/peg/ast"
 import {
   PrimaryExpression,
@@ -202,7 +202,7 @@ const rule_expression = makeRuleNode(
   )
 )
 
-const rule_grammer = makeGrammerNode([
+const rule_grammar = makeGrammarNode([
   rule_expression,
   rule_term,
   rule_factor,
@@ -263,5 +263,5 @@ test("grammar", () => {
   const pc = new ParseContext(new ParserCache(), pr)
   pr.add("Expression", Expression)
   pr.add("Code", Code)
-  expect(Grammar.parse(pc, arithmetics_src)!.value).toStrictEqual(rule_grammer)
+  expect(Grammar.parse(pc, arithmetics_src)!.value).toStrictEqual(rule_grammar)
 })

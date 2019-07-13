@@ -20,7 +20,7 @@ import { pickFirst, pickSecond } from "../utils"
 import {
   SuffixedOperatorEnum,
   PrefixedOperatorEnum,
-  makeGrammerNode,
+  makeGrammarNode,
   makeRuleNode,
   makeLabeledExpressionNode,
   makeSequenceExpressionNode,
@@ -113,7 +113,7 @@ export const Grammar = sequence(
   zeroOrOne(sequence(Initializer, __).map(pickFirst)),
   repeat1(sequence(Rule, __).map(pickFirst))
 ).map(([_, init, rules]) =>
-  init === null ? makeGrammerNode(rules) : makeGrammerNode(rules, init)
+  init === null ? makeGrammarNode(rules) : makeGrammarNode(rules, init)
 )
 const pr = new ParserResolver()
 const pc = new ParseContext(new ParserCache(), pr)
